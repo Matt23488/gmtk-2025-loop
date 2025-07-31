@@ -40,18 +40,20 @@ export default class Renderer {
         renderable.render(this.#context);
     }
 
-    renderTest(fps: number) {
+    renderFps(fps: number) {
+        this.#context.font = '30px sans-serif';
+        this.#context.textBaseline = 'top';
+        this.#context.fillStyle = 'white';
+        this.#context.fillText(`fps: ${fps.toFixed(1)}`, 20, 20);
+    }
+
+    renderTest() {
         this.#context.fillStyle = 'red';
         this.#context.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
 
         this.#context.strokeStyle = 'black';
         this.#context.lineWidth = 10;
         this.#context.strokeRect(0, 0, this.#canvas.width, this.#canvas.height);
-
-        this.#context.font = '30px sans-serif';
-        this.#context.textBaseline = 'top';
-        this.#context.fillStyle = 'white';
-        this.#context.fillText(`fps: ${fps.toFixed(1)}`, 20, 20);
     }
 }
 

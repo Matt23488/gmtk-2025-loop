@@ -12,7 +12,7 @@ export default class InGame extends GameScreen {
 
         this.#player = new Player();
         this.#walls = [
-            new Wall(30, 50, 30, 600),
+            new Wall(30, 15, 30, 600),
             new Wall(230, 50, 30, 600),
         ];
     }
@@ -24,7 +24,9 @@ export default class InGame extends GameScreen {
 
     render(renderer: Renderer): void {
         renderer.beginFrame();
-        renderer.renderTest(this.#fps);
+        renderer.renderTest();
         this.#walls.forEach(renderer.render.bind(renderer));
+
+        renderer.renderFps(this.#fps);
     }
 }
