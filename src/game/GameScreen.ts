@@ -15,6 +15,6 @@ export default abstract class GameScreen {
         this.#nextScreen = screen;
     }
 
-    update(_: number): void {}
-    render(_: Renderer): void {}
+    update(_deltaTime: number): void {}
+    render(_renderer: Renderer): void {}
 }

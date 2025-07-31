@@ -1,6 +1,6 @@
 import type GameScreen from './GameScreen';
 import Renderer from './Renderer';
-import { HtmlTemplateRegistry } from './screens/HtmlScreen';
+import { HtmlTemplateRegistry } from './HtmlScreen';
 import MainMenu from './screens/MainMenu';
 
 export default class Game {

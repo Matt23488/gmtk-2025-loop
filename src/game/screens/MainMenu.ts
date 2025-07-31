@@ -1,4 +1,4 @@
-import HtmlScreen, { HtmlTemplateRegistry, TemplateUrl, type HtmlTemplate } from './HtmlScreen';
+import HtmlScreen, { HtmlTemplateRegistry, TemplateUrl, type HtmlTemplate } from '../HtmlScreen';
 import InGame from './InGame';
 
 import templateUrl from '/MainMenu.html?url';

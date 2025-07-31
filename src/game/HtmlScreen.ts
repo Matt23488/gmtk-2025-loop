@@ -1,7 +1,7 @@
-import GameScreen from '../GameScreen';
-import type Renderer from '../Renderer';
+import GameScreen from './GameScreen';
+import type Renderer from './Renderer';
 
-import { Brand } from '../../utils/Brand';
+import { Brand } from '../utils/Brand';
 
 export default abstract class HtmlScreen extends GameScreen {
     #renderedContent: HTMLElement | null;
