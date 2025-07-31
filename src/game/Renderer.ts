@@ -1,7 +1,12 @@
+import { TypeExhaustionError } from '../utils/Errors';
+import { ScreenSpaceCoordinate, type WorldSpaceCoordinate } from './Camera';
+import Camera from './Camera';
+
 export default class Renderer {
     #container: HTMLElement;
     #canvas: HTMLCanvasElement;
     #context: CanvasRenderingContext2D;
+    #camera: Camera | null;
 
     constructor(container: HTMLElement) {
         this.#container = container;
@@ -17,15 +22,16 @@ export default class Renderer {
         if (!context) throw new Error('Canvas context null');
 
         this.#context = context;
+        this.#camera = null;
     }
 
     #resizeCanvas() {
         let height = this.#container.clientHeight;
-        let width = height * aspectRatio;
+        let width = height * Camera.aspectRatio;
 
         if (width > this.#container.clientWidth) {
             width = this.#container.clientWidth;
-            height = width / aspectRatio;
+            height = width / Camera.aspectRatio;
         }
 
         this.#canvas.width = width;
@@ -33,32 +39,99 @@ export default class Renderer {
     }
 
     beginFrame() {
+        this.#context.imageSmoothingEnabled = false;
         this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 
-    render(renderable: Renderable) {
-        renderable.render(this.#context);
+    get camera() {
+        if (!this.#camera)
+            throw new Error('Cannot get camera');
+
+        return this.#camera;
+    }
+
+    set camera(camera: Camera) {
+        this.#camera = camera;
+    }
+
+    get screenDimensions(): Geometry.Point<ScreenSpaceCoordinate> {
+        return [
+            ScreenSpaceCoordinate.from(this.#canvas.width),
+            ScreenSpaceCoordinate.from(this.#canvas.height),
+        ];
+    }
+
+    renderRect(...[worldPosition, worldWidth, worldHeight, options]: RenderPrimativeArgs<'rect'>) {
+        const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
+        const screenDimensions = this.camera.transformDimensions([worldWidth, worldHeight], this.screenDimensions);
+
+        this.#render(options.passes, 'Rect', ...screenPosition, ...screenDimensions);
+    }
+
+    renderText(...[worldPosition, text, font, textAlign, textBaseline, options]: RenderPrimativeArgs<'text'>) {
+        this.#context.font = font;
+        this.#context.textAlign = textAlign;
+        this.#context.textBaseline = textBaseline;
+
+        const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
+
+        this.#render(options.passes, 'Text', text, ...screenPosition);
     }
 
     renderFps(fps: number) {
         this.#context.font = '30px sans-serif';
+        this.#context.textAlign = 'left';
         this.#context.textBaseline = 'top';
         this.#context.fillStyle = 'white';
         this.#context.fillText(`fps: ${fps.toFixed(1)}`, 20, 20);
     }
 
-    renderTest() {
-        this.#context.fillStyle = 'red';
-        this.#context.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
+    // TODO: Improve this, this API sucks
+    #render<Call extends Capitalize<RenderPrimative>>(passes: RenderPass[], call: Call, ...args: RenderCallArgs<Call>) {
+        for (const pass of passes) {
+            let renderFunction: (...args: RenderCallArgs<Call>) => void;
 
-        this.#context.strokeStyle = 'black';
-        this.#context.lineWidth = 10;
-        this.#context.strokeRect(0, 0, this.#canvas.width, this.#canvas.height);
+            switch (pass.type) {
+                case 'fill':
+                    this.#context.fillStyle = pass.style;
+                    renderFunction = this.#context[`fill${call}`].bind(this.#context) as any;
+                    break;
+                case 'stroke':
+                    this.#context.strokeStyle = pass.style;
+                    this.#context.lineWidth = pass.width;
+                    renderFunction = this.#context[`stroke${call}`].bind(this.#context) as any;
+                    break;
+                default:
+                    throw new TypeExhaustionError('RenderPass', pass);
+            }
+
+            renderFunction(...args);
+        }
     }
 }
 
-const aspectRatio = 16 / 9;
+export type RenderPrimative = keyof RenderPrimativeTypeMap;
 
-export interface Renderable {
-    render(ctx: CanvasRenderingContext2D): void;
+interface RenderPrimativeTypeMap {
+    rect: [width: WorldSpaceCoordinate, height: WorldSpaceCoordinate];
+    text: [text: string, font: string, textAlign: CanvasTextAlign, textBaseline: CanvasTextBaseline];
 }
+
+export interface RenderPrimativeOptions {
+    passes: RenderPass[];
+}
+
+export type RenderPass = Utils.DiscriminatedUnion<RenderPassTypeMap>;
+interface RenderPassTypeMap {
+    fill: {
+        style: string;
+    };
+
+    stroke: {
+        style: string;
+        width: number;
+    };
+}
+
+type RenderCallArgs<Call extends Capitalize<RenderPrimative>> = Parameters<CanvasRenderingContext2D[`fill${Call}`]>;
+type RenderPrimativeArgs<Primative extends RenderPrimative> = [position: Geometry.Point<WorldSpaceCoordinate>, ...RenderPrimativeTypeMap[Primative], options: RenderPrimativeOptions];

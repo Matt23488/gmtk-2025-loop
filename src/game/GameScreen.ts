@@ -1,3 +1,4 @@
+import type Input from './Input';
 import type Renderer from './Renderer';
 
 export default abstract class GameScreen {
@@ -15,6 +16,6 @@ export default abstract class GameScreen {
         this.#nextScreen = screen;
     }
 
-    update(_deltaTime: number): void {}
+    update(_deltaTime: number, _input: Input): void {}
     render(_renderer: Renderer): void {}
 }
