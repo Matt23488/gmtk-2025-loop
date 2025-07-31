@@ -1,24 +1,23 @@
-import HtmlScreen from './HtmlScreen';
+import HtmlScreen, { HtmlTemplateRegistry, TemplateUrl, type HtmlTemplate } from './HtmlScreen';
 import InGame from './InGame';
 
+import templateUrl from '/MainMenu.html?url';
+import cssUrl from '/MainMenu.css?url';
+
+const template = HtmlTemplateRegistry.register('MainMenu', TemplateUrl.from(templateUrl));
+
 export default class MainMenu extends HtmlScreen {
-    protected get content(): HTMLElement {
-        const container = document.createElement('div');
+    protected get template(): HtmlTemplate {
+        return template;
+    }
 
-        const title = document.createElement('h1');
-        title.textContent = 'Main Menu';
+    protected get cssUrl(): string | null {
+        return cssUrl;
+    }
 
-        const playButton = document.createElement('button');
-        playButton.textContent = 'Play';
+    protected initialize(container: HTMLElement): void {
+        const playBtn = container.querySelector<HTMLButtonElement>('#playBtn')!;
 
-        playButton.addEventListener(
-            'click',
-            () => this.transitionTo(new InGame())
-        );
-
-        container.appendChild(title);
-        container.appendChild(playButton);
-
-        return container;
+        playBtn.addEventListener('click', () => this.transitionTo(new InGame()));
     }
 }

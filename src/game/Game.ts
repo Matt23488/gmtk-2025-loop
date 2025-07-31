@@ -1,5 +1,6 @@
 import type GameScreen from './GameScreen';
 import Renderer from './Renderer';
+import { HtmlTemplateRegistry } from './screens/HtmlScreen';
 import MainMenu from './screens/MainMenu';
 
 export default class Game {
@@ -11,7 +12,9 @@ export default class Game {
         this.#screen = new MainMenu(container);
     }
 
-    start() {
+    async start() {
+        await HtmlTemplateRegistry.loadTemplates();
+
         requestAnimationFrame(this.#loop.bind(this));
     }
 
