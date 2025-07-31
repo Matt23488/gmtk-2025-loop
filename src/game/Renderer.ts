@@ -86,27 +86,23 @@ export default class Renderer {
         this.#context.fillText(`fps: ${fps.toFixed(1)}`, 20, 20);
     }
 
-    // TODO: Improve this, this API sucks
-    #render<Call extends Capitalize<RenderPrimative>>(passes: RenderPass[], call: Call, ...args: RenderCallArgs<Call>) {
-        for (const pass of passes) {
-            let renderFunction: (...args: RenderCallArgs<Call>) => void;
-
-            switch (pass.type) {
-                case 'fill':
-                    this.#context.fillStyle = pass.style;
-                    renderFunction = this.#context[`fill${call}`].bind(this.#context) as any;
-                    break;
-                case 'stroke':
-                    this.#context.strokeStyle = pass.style;
-                    this.#context.lineWidth = pass.width;
-                    renderFunction = this.#context[`stroke${call}`].bind(this.#context) as any;
-                    break;
-                default:
-                    throw new TypeExhaustionError('RenderPass', pass);
-            }
-
-            renderFunction(...args);
+    #renderPass<Primative extends RenderPrimative>(pass: RenderPass, call: Capitalize<Primative>): Utils.AnyFunction {
+        switch (pass.type) {
+            case 'fill':
+                this.#context.fillStyle = pass.style;
+                return this.#context[`fill${call}`].bind(this.#context);
+            case 'stroke':
+                this.#context.strokeStyle = pass.style;
+                this.#context.lineWidth = pass.width;
+                return this.#context[`stroke${call}`].bind(this.#context);
+            default:
+                throw new TypeExhaustionError('RenderPass', pass);
         }
+    }
+
+    #render<Primative extends RenderPrimative>(passes: RenderPass[], call: Capitalize<Primative>, ...args: RenderCallArgs<Capitalize<Primative>>) {
+        for (const pass of passes)
+            this.#renderPass(pass, call)(...args);
     }
 }
 
@@ -121,6 +117,7 @@ export interface RenderPrimativeOptions {
     passes: RenderPass[];
 }
 
+export type RenderPassType = RenderPass['type'];
 export type RenderPass = Utils.DiscriminatedUnion<RenderPassTypeMap>;
 interface RenderPassTypeMap {
     fill: {
@@ -133,5 +130,5 @@ interface RenderPassTypeMap {
     };
 }
 
-type RenderCallArgs<Call extends Capitalize<RenderPrimative>> = Parameters<CanvasRenderingContext2D[`fill${Call}`]>;
+type RenderCallArgs<Call extends Capitalize<RenderPrimative>> = Parameters<CanvasRenderingContext2D[`${RenderPassType}${Call}`]>;
 type RenderPrimativeArgs<Primative extends RenderPrimative> = [position: Geometry.Point<WorldSpaceCoordinate>, ...RenderPrimativeTypeMap[Primative], options: RenderPrimativeOptions];
