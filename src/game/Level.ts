@@ -40,6 +40,31 @@ export default class Level {
         this.#renderBackground(renderer);
         this.#renderGround(renderer);
         this.#renderTiles(renderer);
+
+        // Debug text
+        renderer.renderText(
+            [
+                WorldSpaceCoordinate.from(16),
+                WorldSpaceCoordinate.from(9),
+            ],
+            'A/D or Left/Right to move camera',
+            'bold 50px sans-serif',
+            'center',
+            'middle',
+            {
+                passes: [
+                    {
+                        type: 'fill',
+                        style: 'white',
+                    },
+                    {
+                        type: 'stroke',
+                        style: 'black',
+                        width: 2,
+                    },
+                ],
+            }
+        )
     }
 
     #renderBackground(renderer: Renderer): void {
