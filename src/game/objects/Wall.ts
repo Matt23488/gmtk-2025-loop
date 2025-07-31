@@ -1,6 +1,6 @@
-import type { Renderable } from './renderer';
+import type { Renderable } from '../Renderer';
 
-export class Wall implements Renderable {
+export default class Wall implements Renderable {
     #x: number;
     #y: number;
     #w: number;

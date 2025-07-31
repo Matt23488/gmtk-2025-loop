@@ -1,9 +1,9 @@
-export class Renderer {
-    #container: HTMLDivElement;
+export default class Renderer {
+    #container: HTMLElement;
     #canvas: HTMLCanvasElement;
     #context: CanvasRenderingContext2D;
 
-    constructor(container: HTMLDivElement) {
+    constructor(container: HTMLElement) {
         this.#container = container;
         this.#canvas = document.createElement('canvas');
 
