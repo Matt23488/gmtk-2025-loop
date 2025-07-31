@@ -56,11 +56,6 @@ export default class Level {
                         type: 'fill',
                         style: 'rgb(60, 150, 255)',
                     },
-                    {
-                        type: 'stroke',
-                        style: 'green',
-                        width: 5,
-                    },
                 ],
             }
         );

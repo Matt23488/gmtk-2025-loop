@@ -26,7 +26,7 @@ export default class InGame extends GameScreen {
         this.#fps = 1000 / deltaTime;
 
         const deltaSeconds = deltaTime / 1000;
-        const cameraMovementAmount = 3 * deltaSeconds; // 3 blocks per second
+        const cameraMovementAmount = 10 * deltaSeconds;
 
         if (input.leftPressed)
             this.#camera.moveLeft(WorldSpaceCoordinate.from(cameraMovementAmount));
