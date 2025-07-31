@@ -37,9 +37,12 @@ export default class Level {
     }
 
     render(renderer: Renderer): void {
-        if (this.#data.type !== 'loaded')
-            return;
+        this.#renderBackground(renderer);
+        this.#renderGround(renderer);
+        this.#renderTiles(renderer);
+    }
 
+    #renderBackground(renderer: Renderer): void {
         renderer.renderRect(
             [
                 WorldSpaceCoordinate.from(0),
@@ -61,12 +64,65 @@ export default class Level {
                 ],
             }
         );
+    }
 
-        for (const collision of this.#data.data.collision) {
+    #renderGround(renderer: Renderer): void {
+        // Ground
+        renderer.renderRect(
+            [
+                WorldSpaceCoordinate.from(0),
+                WorldSpaceCoordinate.from(0),
+            ],
+            this.width,
+            WorldSpaceCoordinate.from(1),
+            {
+                passes: [
+                    {
+                        type: 'fill',
+                        style: 'brown',
+                    },
+                    {
+                        type: 'stroke',
+                        style: 'black',
+                        width: 2,
+                    },
+                ],
+            }
+        );
+
+        // Ceiling
+        renderer.renderRect(
+            [
+                WorldSpaceCoordinate.from(0),
+                WorldSpaceCoordinate.from(this.height - 1),
+            ],
+            this.width,
+            WorldSpaceCoordinate.from(1),
+            {
+                passes: [
+                    {
+                        type: 'fill',
+                        style: 'brown',
+                    },
+                    {
+                        type: 'stroke',
+                        style: 'black',
+                        width: 2,
+                    },
+                ],
+            }
+        );
+    }
+
+    #renderTiles(renderer: Renderer): void {
+        if (this.#data.type !== 'loaded')
+            return;
+
+        for (const tile of this.#data.data.tiles) {
             renderer.renderRect(
-                collision.position,
-                collision.width,
-                collision.height, 
+                tile,
+                WorldSpaceCoordinate.from(1),
+                WorldSpaceCoordinate.from(1),
                 {
                     passes: [
                         {
@@ -97,16 +153,10 @@ interface LevelDataTypeMap {
 export interface LevelJson {
     width: WorldSpaceCoordinate;
     height: WorldSpaceCoordinate;
-    collision: CollisionJson[]; // TODO: Change to Tile positions
+    startPosition: Geometry.Point<WorldSpaceCoordinate>;
+    goalPosition: Geometry.Point<WorldSpaceCoordinate>;
+    tiles: Geometry.Point<WorldSpaceCoordinate>[];
     objects: ObjectJson[];
-
-    // TODO: Start and Goal positions
-}
-
-export interface CollisionJson {
-    position: Geometry.Point<WorldSpaceCoordinate>;
-    width: WorldSpaceCoordinate;
-    height: WorldSpaceCoordinate;
 }
 
 export interface ObjectJson {
