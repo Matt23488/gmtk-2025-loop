@@ -1,35 +1,12 @@
 export default class Input {
     #left = false;
     #right = false;
+    #jumpPressed = false;
+    #pausePressed = false;
 
     constructor() {
-        document.addEventListener('keydown', e => {
-            if (e.repeat) return;
-
-            switch (e.key) {
-                case 'a':
-                case 'ArrowLeft':
-                    this.#left = true;
-                    break;
-                case 'd': 
-                case 'ArrowRight':
-                    this.#right = true;
-                    break;
-            }
-        });
-
-        document.addEventListener('keyup', e => {
-            switch (e.key) {
-                case 'a':
-                case 'ArrowLeft':
-                    this.#left = false;
-                    break;
-                case 'd': 
-                case 'ArrowRight':
-                    this.#right = false;
-                    break;
-            }
-        });
+        document.addEventListener('keydown', this.#getEventListener(true));
+        document.addEventListener('keyup', this.#getEventListener(false));
     }
 
     get leftPressed(): boolean {
@@ -38,5 +15,39 @@ export default class Input {
 
     get rightPressed(): boolean {
         return this.#right;
+    }
+
+    get jumpPressed(): boolean {
+        return this.#jumpPressed;
+    }
+
+    get pausePressed(): boolean {
+        return this.#pausePressed;
+    }
+
+    #getEventListener(value: boolean): (e: KeyboardEvent) => void {
+        return e => {
+            if (e.repeat && value) return;
+
+            switch (e.key) {
+                case 'a':
+                case 'ArrowLeft':
+                    this.#left = value;
+                    break;
+
+                case 'd': 
+                case 'ArrowRight':
+                    this.#right = value;
+                    break;
+
+                case ' ':
+                    this.#jumpPressed = value;
+                    break;
+
+                case 'Escape':
+                    this.#pausePressed = value;
+                    break;
+            }
+        };
     }
 }

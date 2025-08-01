@@ -1,10 +1,9 @@
 {
     "width": 32,
     "height": 18,
-    "mobius": false,
-    "nextLevel": 1,
+    "mobius": true,
     "startPosition": [16, 4],
-    "goalPosition": [1, 1],
+    "goalPosition": [1, 16],
     "collision": [
         {
             "position": [3, 0],
@@ -13,7 +12,7 @@
         }
     ],
     "tiles": [
-        [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6]
+        [2, 16], [2, 15], [2, 14], [2, 13], [2, 12], [2, 11]
     ],
     "objects": []
 }

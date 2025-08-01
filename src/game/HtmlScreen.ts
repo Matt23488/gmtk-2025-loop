@@ -5,13 +5,11 @@ import { Brand } from '../utils/Brand';
 
 export default abstract class HtmlScreen extends GameScreen {
     #renderedContent: HTMLElement | null;
-    #container: HTMLElement;
 
     constructor(container: HTMLElement) {
-        super();
+        super(container);
 
         this.#renderedContent = null;
-        this.#container = container;
     }
 
     protected abstract get template(): HtmlTemplate;
@@ -42,7 +40,7 @@ export default abstract class HtmlScreen extends GameScreen {
             screenContainer.prepend(styles);
         }
         
-        this.#container.appendChild(screenContainer);
+        this.container.appendChild(screenContainer);
         this.initialize(screenContainer);
 
         this.#renderedContent = screenContainer;

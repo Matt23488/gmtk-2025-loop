@@ -23,7 +23,7 @@ export default class Game {
 
     #lastFrameTime = 0;
     #loop(totalTime: number) {
-        const deltaTime = totalTime - this.#lastFrameTime;
+        const deltaTime = (totalTime - this.#lastFrameTime) / 1000;
         this.#lastFrameTime = totalTime;
 
         this.#screen.update(deltaTime, this.#input);
@@ -33,7 +33,6 @@ export default class Game {
 
         this.#screen = this.#screen.nextScreen;
 
-        // if (totalTime < 5000) // Stop rendering after 5 seconds
         requestAnimationFrame(this.#loop.bind(this));
     }
 }

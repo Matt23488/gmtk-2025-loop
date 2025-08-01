@@ -2,9 +2,11 @@ import type Input from './Input';
 import type Renderer from './Renderer';
 
 export default abstract class GameScreen {
+    protected container: HTMLElement;
     #nextScreen: GameScreen;
 
-    constructor() {
+    constructor(container: HTMLElement) {
+        this.container = container;
         this.#nextScreen = this;
     }
 

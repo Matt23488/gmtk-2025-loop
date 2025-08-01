@@ -18,6 +18,6 @@ export default class MainMenu extends HtmlScreen {
     protected initialize(container: HTMLElement): void {
         const playBtn = container.querySelector<HTMLButtonElement>('#playBtn')!;
 
-        playBtn.addEventListener('click', () => this.transitionTo(new InGame()));
+        playBtn.addEventListener('click', () => this.transitionTo(new InGame(this.container)));
     }
 }
