@@ -8,7 +8,7 @@ import type Renderer from './Renderer';
 export default class Level {
     #player: Player;
 
-    #status: LevelStatus;
+    #status: Utils.LoadStatus;
     #width: WorldSpaceCoordinate;
     #height: WorldSpaceCoordinate;
     #mobius: boolean;
@@ -57,7 +57,7 @@ export default class Level {
             .catch(() => this.#status = 'error');
     }
 
-    public get status(): LevelStatus {
+    public get status(): Utils.LoadStatus {
         return this.#status;
     }
 
@@ -185,6 +185,16 @@ export default class Level {
         
         this.#player.velocityY = WorldSpaceCoordinate.from(this.#player.velocityY - Level.g * deltaTime);
         this.#player.velocityX = WorldSpaceCoordinate.from(this.#player.velocityX * 0.1 * deltaTime);
+
+        if (this.#player.onGround) {
+            if (Math.abs(this.#player.velocityX) > 0.01)
+                this.#player.sprite.playAnimation(1);
+            else
+                this.#player.sprite.playAnimation(0);
+        } else
+            this.#player.sprite.playAnimation(0);//2);
+
+        this.#player.sprite.animate(deltaTime);
     }
 
     get playerHasReachedGoal(): boolean {
@@ -217,7 +227,7 @@ export default class Level {
         this.#_pausePressed = value;
     }
 
-    static readonly g = 20;
+    static readonly g = 100;
     update(deltaTime: number, input: Input): void {
         this.#pausePressed = input.pausePressed;
         if (this.#paused)
@@ -386,15 +396,6 @@ export default class Level {
     #renderPlayer(renderer: Renderer) {
         renderer.renderSprite(this.#player.sprite, this.#player.position, this.#player.size);
     }
-}
-
-export type LevelData = Utils.DiscriminatedUnion<LevelDataTypeMap>;
-export type LevelStatus = LevelData['type'];
-
-interface LevelDataTypeMap {
-    loading: {};
-    loaded: { data: LevelJson };
-    error: { error: unknown };
 }
 
 export interface LevelJson {

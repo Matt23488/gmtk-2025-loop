@@ -6,6 +6,8 @@ declare global {
         type DiscriminatedUnion<TypeMap extends Record<string, any>> = {
             [Type in keyof TypeMap]: Prettify<{ type: Type } & TypeMap[Type]>;
         }[keyof TypeMap];
+
+        type LoadStatus = 'loading' | 'loaded' | 'error';
     }
 
     namespace Geometry {

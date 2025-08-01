@@ -108,6 +108,7 @@ export default class Renderer {
 
         this.#context.drawImage(
             sprite.image,
+            ...sprite.subImageParameters,
             x, y, w, h
         );
     }
