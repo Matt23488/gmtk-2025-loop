@@ -14,40 +14,24 @@ export default class Camera {
 
     get center(): Geometry.Point<WorldSpaceCoordinate> {
         return [
-            WorldSpaceCoordinate.from(this.worldWidth / 2 + this.#position),
+            WorldSpaceCoordinate.from(this.width / 2 + this.#position),
             WorldSpaceCoordinate.from(this.#level.height / 2),
         ];
     }
 
-    get worldWidth(): WorldSpaceCoordinate {
+    get width(): WorldSpaceCoordinate {
         return WorldSpaceCoordinate.from(Camera.aspectRatio * this.#level.height);
     }
 
-    moveLeft(amount: WorldSpaceCoordinate) {
-        let newPosition = this.#position - amount;
-        if (newPosition < -this.worldWidth) {
-            newPosition += this.#level.width;
-            this.#level.wrap();
-        }
-
-        this.#position = WorldSpaceCoordinate.from(newPosition);
-    }
-
-    moveRight(amount: WorldSpaceCoordinate) {
-        let newPosition = this.#position + amount;
-        if (newPosition > this.#level.width) {
-            newPosition -= this.#level.width;
-            this.#level.wrap();
-        }
-
-        this.#position = WorldSpaceCoordinate.from(newPosition);
+    centerAt(position: WorldSpaceCoordinate) {
+        this.#position = WorldSpaceCoordinate.from(position - this.width / 2);
     }
 
     transformPoint(point: Geometry.Point<WorldSpaceCoordinate>, screenDimensions: Geometry.Point<ScreenSpaceCoordinate>): Geometry.Point<ScreenSpaceCoordinate> {
         const [worldX, worldY] = point;
         const [screenFullWidth, screenFullHeight] = screenDimensions;
 
-        const screenX = ScreenSpaceCoordinate.from((worldX - this.#position) / this.worldWidth * screenFullWidth);
+        const screenX = ScreenSpaceCoordinate.from((worldX - this.#position) / this.width * screenFullWidth);
         const screenY = ScreenSpaceCoordinate.from((1 - worldY / this.#level.height) * screenFullHeight);
 
         return [screenX, screenY];
@@ -57,7 +41,7 @@ export default class Camera {
         const [worldWidth, worldHeight] = dimensions;
         const [screenFullWidth, screenFullHeight] = screenDimensions;
 
-        const screenWidth = ScreenSpaceCoordinate.from(worldWidth / this.worldWidth * screenFullWidth);
+        const screenWidth = ScreenSpaceCoordinate.from(worldWidth / this.width * screenFullWidth);
         const screenHeight = ScreenSpaceCoordinate.from(-worldHeight / this.#level.height * screenFullHeight);
 
         return [screenWidth, screenHeight];

@@ -6,19 +6,18 @@ import Player from '../Player';
 import type Renderer from '../Renderer';
 
 export default class InGame extends GameScreen {
-    #player: Player;
     #currentLevelNum: number;
     #currentLevel: Level;
     #camera: Camera;
+    #player: Player;
 
     constructor() {
         super();
-
-        this.#player = new Player();
-
+        
         this.#currentLevelNum = 0;
         this.#currentLevel = new Level(0);
         this.#camera = new Camera(this.#currentLevel);
+        this.#player = new Player(this.#currentLevel);
     }
 
     #fps = 0;
@@ -26,13 +25,15 @@ export default class InGame extends GameScreen {
         this.#fps = 1000 / deltaTime;
 
         const deltaSeconds = deltaTime / 1000;
-        const cameraMovementAmount = 10 * deltaSeconds;
+        const playerMovementAmount = 10 * deltaSeconds;
 
         if (input.leftPressed)
-            this.#camera.moveLeft(WorldSpaceCoordinate.from(cameraMovementAmount));
+            this.#player.moveLeft(WorldSpaceCoordinate.from(playerMovementAmount));
 
         if (input.rightPressed)
-            this.#camera.moveRight(WorldSpaceCoordinate.from(cameraMovementAmount));
+            this.#player.moveRight(WorldSpaceCoordinate.from(playerMovementAmount));
+
+        this.#camera.centerAt(this.#player.position[0]);
     }
 
     render(renderer: Renderer): void {
@@ -40,6 +41,7 @@ export default class InGame extends GameScreen {
 
         if (this.#currentLevel.status === 'loaded') {
             this.#currentLevel.render(renderer);
+            this.#player.render(renderer);
         } else
             renderer.renderText(
                 this.#camera.center,
@@ -63,5 +65,6 @@ export default class InGame extends GameScreen {
     #transitionLevel() {
         this.#currentLevel = new Level(this.#currentLevelNum);
         this.#camera = new Camera(this.#currentLevel);
+        this.#player = new Player(this.#currentLevel);
     }
 }

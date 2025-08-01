@@ -3,19 +3,24 @@ import type Renderer from './Renderer';
 
 export default class Level {
     #data: LevelData;
+    #loadPromise: Promise<void>;
 
     constructor(levelNumber: number) {
         this.#data = { type: 'loading' };
 
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
-        fetch(url)
+        this.#loadPromise = fetch(url)
             .then(r => r.json())
             // .then(async data => {
             //     await new Promise(resolve => setTimeout(resolve, 5000));
             //     return data;
             // })
-            .then(data => this.#data = { type: 'loaded', data })
-            .catch(error => this.#data = { type: 'error', error });
+            .then(data => { this.#data = { type: 'loaded', data } })
+            .catch(error => { this.#data = { type: 'error', error } });
+    }
+
+    public load(): Promise<void> {
+        return this.#loadPromise;
     }
 
     public get status(): LevelStatus {
@@ -43,7 +48,21 @@ export default class Level {
         return false;
     }
 
+    public get startPosition(): Geometry.Point<WorldSpaceCoordinate> {
+        if (this.#data.type === 'loaded')
+            return this.#data.data.startPosition;
+
+        return [
+            WorldSpaceCoordinate.from(0),
+            WorldSpaceCoordinate.from(-69),
+        ];
+    }
+
     #flipped = false;
+    get flipped(): boolean {
+        return this.#flipped;
+    }
+
     wrap() {
         if (this.mobius)
             this.#flipped = !this.#flipped;
@@ -63,7 +82,7 @@ export default class Level {
                     WorldSpaceCoordinate.from(16 + i * this.width),
                     WorldSpaceCoordinate.from(9),
                 ],
-                'A/D or Left/Right to move camera',
+                'A/D or Left/Right to move',
                 'bold 50px sans-serif',
                 'center',
                 'middle',
