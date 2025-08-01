@@ -65,7 +65,7 @@ export default class Renderer {
         const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
         const screenDimensions = this.camera.transformDimensions([worldWidth, worldHeight], this.screenDimensions);
 
-        this.#render(options.passes, 'Rect', ...screenPosition, ...screenDimensions);
+        this.#render(options, 'Rect', ...screenPosition, ...screenDimensions);
     }
 
     renderText(...[worldPosition, text, font, textAlign, textBaseline, options]: RenderPrimativeArgs<'text'>) {
@@ -75,7 +75,7 @@ export default class Renderer {
 
         const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
 
-        this.#render(options.passes, 'Text', text, ...screenPosition);
+        this.#render(options, 'Text', text, ...screenPosition);
     }
 
     renderFps(fps: number) {
@@ -100,8 +100,8 @@ export default class Renderer {
         }
     }
 
-    #render<Primative extends RenderPrimative>(passes: RenderPass[], call: Capitalize<Primative>, ...args: RenderCallArgs<Capitalize<Primative>>) {
-        for (const pass of passes)
+    #render<Primative extends RenderPrimative>(options: RenderPrimativeOptions, call: Capitalize<Primative>, ...args: RenderCallArgs<Capitalize<Primative>>) {
+        for (const pass of options.passes)
             this.#renderPass(pass, call)(...args);
     }
 }

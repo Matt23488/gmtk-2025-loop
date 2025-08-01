@@ -25,14 +25,20 @@ export default class Camera {
 
     moveLeft(amount: WorldSpaceCoordinate) {
         let newPosition = this.#position - amount;
-        if (newPosition < 0) newPosition = 0;
+        if (newPosition < -this.worldWidth) {
+            newPosition += this.#level.width;
+            this.#level.wrap();
+        }
 
         this.#position = WorldSpaceCoordinate.from(newPosition);
     }
 
     moveRight(amount: WorldSpaceCoordinate) {
         let newPosition = this.#position + amount;
-        if (newPosition > this.#level.width - this.worldWidth) newPosition = this.#level.width - this.worldWidth;
+        if (newPosition > this.#level.width) {
+            newPosition -= this.#level.width;
+            this.#level.wrap();
+        }
 
         this.#position = WorldSpaceCoordinate.from(newPosition);
     }
