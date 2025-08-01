@@ -4,11 +4,9 @@ import type Input from './Input';
 import Player from './Player';
 import type { RenderPass } from './Renderer';
 import type Renderer from './Renderer';
-import Sprite from './Sprite';
 
 export default class Level {
     #player: Player;
-    #playerSprite: Sprite;
 
     #status: LevelStatus;
     #width: WorldSpaceCoordinate;
@@ -21,7 +19,6 @@ export default class Level {
 
     constructor(levelNumber: number) {
         this.#player = new Player();
-        this.#playerSprite = new Sprite('Cass');
 
         this.#status = 'loading';
         this.#width = WorldSpaceCoordinate.from(16);
@@ -387,7 +384,7 @@ export default class Level {
     }
 
     #renderPlayer(renderer: Renderer) {
-        renderer.renderSprite(this.#playerSprite, this.#player.position, this.#player.size);
+        renderer.renderSprite(this.#player.sprite, this.#player.position, this.#player.size);
     }
 }
 

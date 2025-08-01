@@ -1,15 +1,23 @@
 export default class Sprite {
-    #img: HTMLImageElement;
+    #imgR: HTMLImageElement;
+    #imgL: HTMLImageElement;
 
     constructor(name: string) {
-        const url = `${import.meta.env.BASE_URL}Sprites/${name}.png`;
-
-        this.#img = document.createElement('img');
-        this.#img.src = url;
-        this.#img.onload = () => {};
+        this.#imgR = this.#loadImage(`${name}_R`);
+        this.#imgL = this.#loadImage(`${name}_L`);
     }
 
     get image(): CanvasImageSource {
-        return this.#img;
+        return this.flipHorizontal ? this.#imgL : this.#imgR;
     }
+
+    #loadImage(name: string): HTMLImageElement {
+        const img = document.createElement('img');
+        img.src = `${import.meta.env.BASE_URL}Sprites/${name}.png`;;
+        img.onload = () => {};
+
+        return img;
+    }
+
+    flipHorizontal = false;
 }

@@ -106,7 +106,10 @@ export default class Renderer {
         const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
         const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
 
-        this.#context.drawImage(sprite.image, x, y, w, h);
+        this.#context.drawImage(
+            sprite.image,
+            x, y, w, h
+        );
     }
 
     renderFps(fps: number) {

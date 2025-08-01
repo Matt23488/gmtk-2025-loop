@@ -1,15 +1,22 @@
 import { WorldSpaceCoordinate } from './Camera';
 import type Input from './Input';
+import Sprite from './Sprite';
 
 export default class Player {
+    #sprite: Sprite;
     #size: Geometry.Point<WorldSpaceCoordinate>;
     #position: Geometry.Point<WorldSpaceCoordinate>;
     #velocity: Geometry.Point<WorldSpaceCoordinate>;
 
     constructor() {
+        this.#sprite = new Sprite('Cass');
         this.#size = [WorldSpaceCoordinate.from(1), WorldSpaceCoordinate.from(1)];
         this.#position = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(0)];
         this.#velocity = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(0)];
+    }
+
+    get sprite(): Sprite {
+        return this.#sprite;
     }
 
     get size(): Geometry.Point<WorldSpaceCoordinate> {
@@ -67,10 +74,12 @@ export default class Player {
     static readonly #movementVelocity = 10;
     #moveLeft() {
         this.velocityX = WorldSpaceCoordinate.from(-Player.#movementVelocity);
+        this.#sprite.flipHorizontal = true;
     }
 
     #moveRight() {
         this.velocityX = WorldSpaceCoordinate.from(Player.#movementVelocity);
+        this.#sprite.flipHorizontal = false;
     }
 
     onGround = false;
