@@ -40,7 +40,7 @@ export default class Renderer {
     }
 
     beginFrame() {
-        this.#context.imageSmoothingEnabled = false;
+        // this.#context.imageSmoothingEnabled = false;
         this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 
