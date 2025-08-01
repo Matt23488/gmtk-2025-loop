@@ -24,7 +24,7 @@ export default class InGame extends GameScreen {
         this.#currentLevel.centerCameraAtPlayer(this.#camera);
 
         if (this.#currentLevel.playerHasReachedGoal) {
-            if (this.#currentLevel.hasNextLevel)
+            if (this.#currentLevel.nextLevel !== null)
                 this.#transitionLevel(this.#currentLevel.nextLevel);
             else
                 this.transitionTo(new MainMenu(this.container))

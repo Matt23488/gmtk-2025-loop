@@ -7,63 +7,72 @@ import type Renderer from './Renderer';
 import Sprite from './Sprite';
 
 export default class Level {
-    #data: LevelData;
     #player: Player;
     #playerSprite: Sprite;
 
+    #status: LevelStatus;
+    #width: WorldSpaceCoordinate;
+    #height: WorldSpaceCoordinate;
+    #mobius: boolean;
+    #nextLevel: number | null;
+    #startPosition: Geometry.Point<WorldSpaceCoordinate>;
+    #goalPosition: Geometry.Point<WorldSpaceCoordinate>;
+    #tiles: Geometry.Point<WorldSpaceCoordinate>[];
+
     constructor(levelNumber: number) {
-        this.#data = { type: 'loading' };
         this.#player = new Player();
         this.#playerSprite = new Sprite('Cass');
+
+        this.#status = 'loading';
+        this.#width = WorldSpaceCoordinate.from(16);
+        this.#height = WorldSpaceCoordinate.from(9);
+        this.#mobius = false;
+        this.#nextLevel = null;
+        this.#startPosition = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(1)];
+        this.#goalPosition = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(-1)];
+        this.#tiles = [];
 
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
         fetch(url)
             .then(r => r.json())
-            .then((data: LevelJson) => {
-                this.#data = { type: 'loaded', data };
-                this.#player.x = data.startPosition[0];
-                this.#player.y = data.startPosition[1];
+            .then(({ width, height, mobius, nextLevel, startPosition, goalPosition, tiles }: LevelJson) => {
+                console.log('loaded level', levelNumber);
+                this.#status = 'loaded';
+                this.#width = width;
+                this.#height = height;
+                this.#mobius = mobius;
+                this.#nextLevel = nextLevel ?? null;
+                this.#startPosition = startPosition;
+                this.#goalPosition = goalPosition;
+                
+                this.#player.x = startPosition[0];
+                this.#player.y = startPosition[1];
+
+                for (let i = 0; i < tiles.length; i++) {
+                    const tileBlock = tiles[i];
+                    const h = tileBlock.h ?? 1;
+                    const w = tileBlock.w ?? 1;
+
+                    for (let y = 0; y < h; y++)
+                        for (let x = 0; x < w; x++)
+                            this.#tiles.push([WorldSpaceCoordinate.from(tileBlock.x + x), WorldSpaceCoordinate.from(tileBlock.y + y)]);
+                }
+
+                console.log(this.#tiles);
             })
-            .catch(error => { this.#data = { type: 'error', error } });
+            .catch(() => this.#status = 'error');
     }
 
     public get status(): LevelStatus {
-        return this.#data.type;
-    }
-
-    public get width(): WorldSpaceCoordinate {
-        if (this.#data.type === 'loaded')
-            return this.#data.data.width;
-
-        return WorldSpaceCoordinate.from(1);
+        return this.#status;
     }
 
     public get height(): WorldSpaceCoordinate {
-        if (this.#data.type === 'loaded')
-            return this.#data.data.height;
-
-        return WorldSpaceCoordinate.from(1);
+        return this.#height;
     }
 
-    public get mobius(): boolean {
-        if (this.#data.type === 'loaded')
-            return this.#data.data.mobius;
-
-        return false;
-    }
-
-    public get hasNextLevel(): boolean {
-        if (this.#data.type === 'loaded')
-            return typeof this.#data.data.nextLevel === 'number';
-
-        return false;
-    }
-
-    public get nextLevel(): number {
-        if (this.#data.type === 'loaded')
-            return this.#data.data.nextLevel ?? 0;
-
-        return 0;
+    public get nextLevel(): number | null {
+        return this.#nextLevel;
     }
 
     #flipped = false;
@@ -72,7 +81,7 @@ export default class Level {
     }
 
     #wrap() {
-        if (this.mobius)
+        if (this.#mobius)
             this.#flipped = !this.#flipped;
     }
 
@@ -82,8 +91,6 @@ export default class Level {
 
     #collidingTiles: number[] = [];
     #updatePlayer(deltaTime: number): void {
-        if (this.#data.type !== 'loaded')
-            return;
 
         let offsetX = WorldSpaceCoordinate.from(this.#player.velocityX * deltaTime);
         let offsetY = WorldSpaceCoordinate.from(this.#player.velocityY * deltaTime + 0.5 * -Level.g * deltaTime * deltaTime);
@@ -97,9 +104,9 @@ export default class Level {
         this.#collidingTiles = [];
 
         if (offsetX < 0) {
-            let tiles = this.#data.data.tiles;
+            let tiles = this.#tiles;
             if (this.flipped)
-                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.height - y - 1)]);
+                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
             const collidingTile = tiles
                 .filter(([tileX, tileY]) => tileX + 1 <= playerX && tileX + 1 > newX && playerY < tileY + 1 && playerY + playerHeight >= tileY)
@@ -112,9 +119,9 @@ export default class Level {
             }
             
         } else if (offsetX > 0) {
-            let tiles = this.#data.data.tiles;
+            let tiles = this.#tiles;
             if (this.flipped)
-                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.height - y - 1)]);
+                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
             const collidingTile = tiles
                 .filter(([tileX, tileY]) => playerX + playerWidth <= tileX && newX + playerWidth > tileX && playerY < tileY + 1 && playerY + playerHeight >= tileY)
@@ -132,14 +139,14 @@ export default class Level {
             this.#player.velocityY = WorldSpaceCoordinate.from(0);
             this.#player.onGround = true;
 
-        } else if (playerY + offsetY + playerHeight > this.height - 1) {
-            offsetY = WorldSpaceCoordinate.from(this.height - 1 - playerY - playerHeight);
+        } else if (playerY + offsetY + playerHeight > this.#height - 1) {
+            offsetY = WorldSpaceCoordinate.from(this.#height - 1 - playerY - playerHeight);
             this.#player.velocityY = WorldSpaceCoordinate.from(0);
 
         } else if (offsetY < 0) {
-            let tiles = this.#data.data.tiles;
+            let tiles = this.#tiles;
             if (this.flipped)
-                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.height - y - 1)]);
+                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
             const collidingTile = tiles
                 .filter(([tileX, tileY]) => tileY + 1 <= playerY && tileY + 1 > newY && playerX < tileX + 1 && playerX + playerWidth >= tileX)
@@ -155,9 +162,9 @@ export default class Level {
             }
 
         } else if (offsetY > 0) {
-            let tiles = this.#data.data.tiles;
+            let tiles = this.#tiles;
             if (this.flipped)
-                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.height - y - 1)]);
+                tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
             const collidingTile = tiles
                 .filter(([tileX, tileY]) => playerY + playerHeight <= tileY && newY + playerHeight > tileY && playerX < tileX + 1 && playerX + playerWidth >= tileX)
@@ -172,10 +179,10 @@ export default class Level {
 
         newX = playerX + offsetX;
         if (newX < 0) {
-            newX += this.width;
+            newX += this.#width;
             this.#wrap();
-        } else if (newX >= this.width) {
-            newX -= this.width;
+        } else if (newX >= this.#width) {
+            newX -= this.#width;
             this.#wrap();
         }
 
@@ -187,14 +194,12 @@ export default class Level {
     }
 
     get playerHasReachedGoal(): boolean {
-        if (this.#data.type !== 'loaded')
-            return false;
 
-        const [goalX, goalY] = this.#data.data.goalPosition;
+        const [goalX, goalY] = this.#goalPosition;
         const [playerX, playerY] = this.#player.position;
         const [playerWidth, playerHeight] = this.#player.size;
 
-        const correctedGoalY = this.flipped ? this.height - goalY - 1 : goalY;
+        const correctedGoalY = this.flipped ? this.#height - goalY - 1 : goalY;
 
         const inLeftRange = playerX + playerWidth > goalX + 0.5;
         const inRightRange = playerX < goalX + 0.5;
@@ -236,23 +241,20 @@ export default class Level {
         this.#renderGoal(renderer);
         this.#renderPlayer(renderer);
 
-        if (this.#data.type !== 'loaded')
-            return;
-
         // Debug colliding tiles
         for (let i = 0; i < this.#collidingTiles.length; i++)
-            this.#renderTile(renderer, this.#data.data.tiles[this.#collidingTiles[i]], false, true);
+            this.#renderTile(renderer, this.#tiles[this.#collidingTiles[i]], false, true);
     }
 
     #renderBackground(renderer: Renderer): void {
         for (let i = -1; i <= 1; i++)
             renderer.renderRect(
                 [
-                    WorldSpaceCoordinate.from(-1 + i * this.width),
+                    WorldSpaceCoordinate.from(-1 + i * this.#width),
                     WorldSpaceCoordinate.from(0),
                 ],
-                WorldSpaceCoordinate.from(this.width + 2),
-                this.height,
+                WorldSpaceCoordinate.from(this.#width + 2),
+                this.#height,
                 {
                     passes: [
                         {
@@ -266,38 +268,35 @@ export default class Level {
 
     #renderGround(renderer: Renderer): void {
         // Ground
-        for (let i = 0; i < this.width; i++)
+        for (let i = 0; i < this.#width; i++)
             this.#renderTile(renderer, [
                 WorldSpaceCoordinate.from(i),
                 WorldSpaceCoordinate.from(0),
             ]);
 
         // Ceiling
-        for (let i = 0; i < this.width; i++)
+        for (let i = 0; i < this.#width; i++)
             this.#renderTile(renderer, [
                 WorldSpaceCoordinate.from(i),
-                WorldSpaceCoordinate.from(this.height - 1),
+                WorldSpaceCoordinate.from(this.#height - 1),
             ]);
     }
 
     #renderTiles(renderer: Renderer): void {
-        if (this.#data.type !== 'loaded')
-            return;
-
-        for (const tile of this.#data.data.tiles) {
+        for (const tile of this.#tiles) {
             this.#renderTile(renderer, tile);
         }
     }
 
     #renderTile(renderer: Renderer, position: Geometry.Point<WorldSpaceCoordinate>, copy = false, debug = false): void {
         const [worldX, worldY] = position;
-        const correctedWorldY = WorldSpaceCoordinate.from(this.#flipped && !copy ? this.height - worldY - 1 : worldY);
+        const correctedWorldY = WorldSpaceCoordinate.from(this.#flipped && !copy ? this.#height - worldY - 1 : worldY);
 
         if (!copy) {
-            const copyY = this.mobius ? this.height - correctedWorldY - 1 : correctedWorldY;
+            const copyY = this.#mobius ? this.#height - correctedWorldY - 1 : correctedWorldY;
                 
-            const leftCopyPosition = [WorldSpaceCoordinate.from(worldX - this.width), copyY] as Geometry.Point<WorldSpaceCoordinate>;
-            const rightCopyPosition = [WorldSpaceCoordinate.from(worldX + this.width), copyY] as Geometry.Point<WorldSpaceCoordinate>;
+            const leftCopyPosition = [WorldSpaceCoordinate.from(worldX - this.#width), copyY] as Geometry.Point<WorldSpaceCoordinate>;
+            const rightCopyPosition = [WorldSpaceCoordinate.from(worldX + this.#width), copyY] as Geometry.Point<WorldSpaceCoordinate>;
 
             this.#renderTile(renderer, leftCopyPosition, true);
             this.#renderTile(renderer, rightCopyPosition, true);
@@ -331,10 +330,8 @@ export default class Level {
     }
 
     #renderStart(renderer: Renderer) {
-        if (this.#data.type !== 'loaded')
-            return;
 
-        const [worldX, worldY] = this.#data.data.startPosition;
+        const [worldX, worldY] = this.#startPosition;
 
         const correctedX = worldX + 0.5;
         const correctedY = worldY + 0.5;
@@ -342,8 +339,8 @@ export default class Level {
         for (let i = -1; i <= 1; i++)
             renderer.renderCircle(
                 [
-                    WorldSpaceCoordinate.from(correctedX + i * this.width),
-                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0 && this.mobius) ? this.height - correctedY : correctedY),
+                    WorldSpaceCoordinate.from(correctedX + i * this.#width),
+                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0 && this.#mobius) ? this.#height - correctedY : correctedY),
                 ],
                 WorldSpaceCoordinate.from(0.3),
                 {
@@ -363,10 +360,8 @@ export default class Level {
     }
 
     #renderGoal(renderer: Renderer) {
-        if (this.#data.type !== 'loaded')
-            return;
 
-        const [worldX, worldY] = this.#data.data.goalPosition;
+        const [worldX, worldY] = this.#goalPosition;
 
         const correctedX = worldX + 0.5;
         const correctedY = worldY + 0.5;
@@ -374,8 +369,8 @@ export default class Level {
         for (let i = -1; i <= 1; i++)
             renderer.renderCircle(
                 [
-                    WorldSpaceCoordinate.from(correctedX + i * this.width),
-                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0 && this.mobius) ? this.height - correctedY : correctedY),
+                    WorldSpaceCoordinate.from(correctedX + i * this.#width),
+                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0 && this.#mobius) ? this.#height - correctedY : correctedY),
                 ],
                 WorldSpaceCoordinate.from(0.3),
                 {
@@ -415,11 +410,12 @@ export interface LevelJson {
     nextLevel?: number;
     startPosition: Geometry.Point<WorldSpaceCoordinate>;
     goalPosition: Geometry.Point<WorldSpaceCoordinate>;
-    tiles: Geometry.Point<WorldSpaceCoordinate>[];
-    objects: ObjectJson[];
+    tiles: TileJson[];
 }
 
-export interface ObjectJson {
-    id: string;
-    position: Geometry.Point<WorldSpaceCoordinate>;
+export interface TileJson {
+    x: WorldSpaceCoordinate;
+    y: WorldSpaceCoordinate;
+    w?: WorldSpaceCoordinate;
+    h?: WorldSpaceCoordinate;
 }
