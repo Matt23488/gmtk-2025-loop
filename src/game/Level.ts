@@ -36,7 +36,6 @@ export default class Level {
         fetch(url)
             .then(r => r.json())
             .then(({ width, height, mobius, nextLevel, startPosition, goalPosition, tiles }: LevelJson) => {
-                console.log('loaded level', levelNumber);
                 this.#status = 'loaded';
                 this.#width = width;
                 this.#height = height;
@@ -57,8 +56,6 @@ export default class Level {
                         for (let x = 0; x < w; x++)
                             this.#tiles.push([WorldSpaceCoordinate.from(tileBlock.x + x), WorldSpaceCoordinate.from(tileBlock.y + y)]);
                 }
-
-                console.log(this.#tiles);
             })
             .catch(() => this.#status = 'error');
     }
