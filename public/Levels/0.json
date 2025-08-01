@@ -2,6 +2,8 @@
     "width": 64,
     "height": 18,
     "mobius": true,
+    "startPosition": [1, 1],
+    "goalPosition": [3, 10],
     "collision": [
         {
             "position": [3, 0],

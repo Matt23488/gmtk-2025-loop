@@ -53,6 +53,8 @@ export default class Level {
         this.#renderBackground(renderer);
         this.#renderGround(renderer);
         this.#renderTiles(renderer);
+        this.#renderStart(renderer);
+        this.#renderGoal(renderer);
 
         // Debug text
         for (let i = -1; i <= 1; i++)
@@ -158,6 +160,70 @@ export default class Level {
                 ],
             }
         );
+    }
+
+    #renderStart(renderer: Renderer) {
+        if (this.#data.type !== 'loaded')
+            return;
+
+        const [worldX, worldY] = this.#data.data.startPosition;
+
+        const correctedX = worldX + 0.5;
+        const correctedY = worldY + 0.5;
+
+        for (let i = -1; i <= 1; i++)
+            renderer.renderCircle(
+                [
+                    WorldSpaceCoordinate.from(correctedX + i * this.width),
+                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0) ? this.height - correctedY : correctedY),
+                ],
+                WorldSpaceCoordinate.from(0.3),
+                {
+                    passes: [
+                        {
+                            type: 'fill',
+                            style: 'rgb(0, 100, 0)',
+                        },
+                        {
+                            type: 'stroke',
+                            style: 'black',
+                            width: 2,
+                        },
+                    ],
+                }
+            );
+    }
+
+    #renderGoal(renderer: Renderer) {
+        if (this.#data.type !== 'loaded')
+            return;
+
+        const [worldX, worldY] = this.#data.data.goalPosition;
+
+        const correctedX = worldX + 0.5;
+        const correctedY = worldY + 0.5;
+
+        for (let i = -1; i <= 1; i++)
+            renderer.renderCircle(
+                [
+                    WorldSpaceCoordinate.from(correctedX + i * this.width),
+                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0) ? this.height - correctedY : correctedY),
+                ],
+                WorldSpaceCoordinate.from(0.3),
+                {
+                    passes: [
+                        {
+                            type: 'fill',
+                            style: 'rgb(100, 0, 100)',
+                        },
+                        {
+                            type: 'stroke',
+                            style: 'black',
+                            width: 2,
+                        },
+                    ],
+                }
+            );
     }
 }
 

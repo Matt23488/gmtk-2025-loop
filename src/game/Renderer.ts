@@ -1,5 +1,5 @@
 import { TypeExhaustionError } from '../utils/Errors';
-import { ScreenSpaceCoordinate, type WorldSpaceCoordinate } from './Camera';
+import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
 
 export default class Renderer {
@@ -76,6 +76,29 @@ export default class Renderer {
         const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
 
         this.#render(options, 'Text', text, ...screenPosition);
+    }
+
+    renderCircle(worldPosition: Geometry.Point<WorldSpaceCoordinate>, radius: WorldSpaceCoordinate, options: RenderPrimativeOptions) {
+        const [screenRadius] = this.camera.transformDimensions([radius, WorldSpaceCoordinate.from(0)], this.screenDimensions);
+        const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
+
+        for (const pass of options.passes) {
+            this.#context.beginPath();
+            this.#context.arc(...screenPosition, screenRadius, 0, Math.PI * 2);
+            switch (pass.type) {
+                case 'fill':
+                    this.#context.fillStyle = pass.style;
+                    this.#context.fill();
+                    break;
+                case 'stroke':
+                    this.#context.strokeStyle = pass.style;
+                    this.#context.lineWidth = pass.width;
+                    this.#context.stroke();
+                    break;
+                default:
+                    throw new TypeExhaustionError('RenderPass', pass);
+            }
+        }
     }
 
     renderFps(fps: number) {
