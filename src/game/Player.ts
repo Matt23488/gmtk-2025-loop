@@ -1,6 +1,5 @@
 import { WorldSpaceCoordinate } from './Camera';
 import type Input from './Input';
-import type Renderer from './Renderer';
 
 export default class Player {
     #size: Geometry.Point<WorldSpaceCoordinate>;
@@ -92,37 +91,5 @@ export default class Player {
 
         if (input.jumpPressed)
             this.#jump();
-    }
-
-    // TODO: Move inside of Level and fix the copy rendering
-    render(renderer: Renderer) {
-        const correctedX = this.x + 0.5;
-        const correctedY = this.y + 0.5;
-
-        // for (let i = -1; i <= 1; i++)
-            renderer.renderCircle(
-                [
-                    WorldSpaceCoordinate.from(correctedX),
-                    WorldSpaceCoordinate.from(correctedY),
-                ],
-                // [
-                //     WorldSpaceCoordinate.from(correctedX + i * this.#level.width),
-                //     WorldSpaceCoordinate.from((this.#level.flipped && i === 0) || (!this.#level.flipped && i !== 0) ? this.#level.height - correctedY : correctedY)
-                // ],
-                WorldSpaceCoordinate.from(0.5),
-                {
-                    passes: [
-                        {
-                            type: 'fill',
-                            style: 'rgb(255, 127, 0)',
-                        },
-                        {
-                            type: 'stroke',
-                            style: 'black',
-                            width: 2,
-                        },
-                    ],
-                }
-            );
     }
 }

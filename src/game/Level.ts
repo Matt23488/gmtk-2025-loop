@@ -4,14 +4,17 @@ import type Input from './Input';
 import Player from './Player';
 import type { RenderPass } from './Renderer';
 import type Renderer from './Renderer';
+import Sprite from './Sprite';
 
 export default class Level {
     #data: LevelData;
     #player: Player;
+    #playerSprite: Sprite;
 
     constructor(levelNumber: number) {
         this.#data = { type: 'loading' };
         this.#player = new Player();
+        this.#playerSprite = new Sprite('Cass');
 
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
         fetch(url)
@@ -231,33 +234,7 @@ export default class Level {
         this.#renderTiles(renderer);
         this.#renderStart(renderer);
         this.#renderGoal(renderer);
-        this.#player.render(renderer);
-
-        // Debug text
-        for (let i = -1; i <= 1; i++)
-            renderer.renderText(
-                [
-                    WorldSpaceCoordinate.from(16 + i * this.width),
-                    WorldSpaceCoordinate.from(9),
-                ],
-                'A/D or Left/Right to move',
-                'bold 50px sans-serif',
-                'center',
-                'middle',
-                {
-                    passes: [
-                        {
-                            type: 'fill',
-                            style: 'white',
-                        },
-                        {
-                            type: 'stroke',
-                            style: 'black',
-                            width: 2,
-                        },
-                    ],
-                }
-            );
+        this.#renderPlayer(renderer);
 
         if (this.#data.type !== 'loaded')
             return;
@@ -280,7 +257,7 @@ export default class Level {
                     passes: [
                         {
                             type: 'fill',
-                            style: 'rgb(60, 150, 255)',
+                            style: 'rgb(48, 29, 0)',
                         },
                     ],
                 }
@@ -329,7 +306,7 @@ export default class Level {
         const passes: RenderPass[] = [
             {
                 type: 'fill',
-                style: 'brown',
+                style: 'rgb(75, 45, 0)',
             },
             {
                 type: 'stroke',
@@ -405,7 +382,7 @@ export default class Level {
                     passes: [
                         {
                             type: 'fill',
-                            style: 'rgb(100, 0, 100)',
+                            style: 'rgba(153, 0, 153, 1)',
                         },
                         {
                             type: 'stroke',
@@ -415,6 +392,10 @@ export default class Level {
                     ],
                 }
             );
+    }
+
+    #renderPlayer(renderer: Renderer) {
+        renderer.renderSprite(this.#playerSprite, this.#player.position, this.#player.size);
     }
 }
 

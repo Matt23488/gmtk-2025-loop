@@ -1,6 +1,7 @@
 import { TypeExhaustionError } from '../utils/Errors';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
+import type Sprite from './Sprite';
 
 export default class Renderer {
     #container: HTMLElement;
@@ -99,6 +100,13 @@ export default class Renderer {
                     throw new TypeExhaustionError('RenderPass', pass);
             }
         }
+    }
+
+    renderSprite(sprite: Sprite, position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>) {
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
+        const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
+
+        this.#context.drawImage(sprite.image, x, y, w, h);
     }
 
     renderFps(fps: number) {
