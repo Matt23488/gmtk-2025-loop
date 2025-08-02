@@ -24,6 +24,7 @@ export default class Level {
 
     #levelNumber: number;
     #status: Utils.LoadStatus;
+    #levelJson: LevelJson | null;
     #width: WorldSpaceCoordinate;
     #height: WorldSpaceCoordinate;
     #mobius: boolean;
@@ -43,6 +44,7 @@ export default class Level {
 
         this.#levelNumber = levelNumber;
         this.#status = 'loading';
+        this.#levelJson = null;
         this.#width = WorldSpaceCoordinate.from(16);
         this.#height = WorldSpaceCoordinate.from(9);
         this.#mobius = false;
@@ -55,48 +57,7 @@ export default class Level {
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
         fetch(url)
             .then(r => r.json())
-            .then(({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites, triggers }: LevelJson) => {
-                this.#status = 'loaded';
-                this.#width = width;
-                this.#height = height;
-                this.#mobius = mobius;
-                this.#nextLevel = nextLevel ?? null;
-                this.#goalPosition = goalPosition;
-
-                for (const { position: [tileX, tileY], width, height } of tiles) {
-                    const w = width ?? 2;
-                    const h = height ?? 2;
-
-                    for (let y = 0; y < h; y++) {
-                        const pieceY = y === 0 ? 'bottom' : y === h - 1 ? 'top' : '';
-                        for (let x = 0; x < w; x++) {
-                            const pieceX = x === 0 ? 'left' : x === w - 1 ? 'right' : '';
-                            
-                            this.#tiles.push([
-                                WorldSpaceCoordinate.from(tileX + x),
-                                WorldSpaceCoordinate.from(tileY + y),
-                                [pieceY, pieceX].filter(s => !!s).join('-') as any || 'center'
-                            ]);
-                        }
-                    }
-                }
-
-                for (const [name, x, y, w, h] of staticSprites ?? []) {
-                    const sprite = new StaticSprite(name);
-                    sprite.initialize([x, y], [w, h], [width, height], mobius);
-
-                    this.#staticSprites.push(sprite);
-                }
-
-                for (const trigger of triggers ?? []) {
-                    this.#triggers.push(TriggerFactory.create(trigger, [width, height], mobius));
-                }
-                
-                this.#player.x = startPosition[0];
-                this.#player.y = startPosition[1];
-                this.#start.initialize(startPosition, [startSize, startSize], [width, height], mobius);
-                this.#goal.type = goalType;
-            })
+            .then(this.#initialize.bind(this))
             .catch(() => this.#status = 'error');
     }
 
@@ -145,6 +106,55 @@ export default class Level {
 
     centerCameraAtPlayer(camera: Camera): void {
         camera.centerAt(this.#player.position[0]);
+    }
+
+    #initialize(levelJson: LevelJson) {
+        this.#levelJson = levelJson;
+        const { width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites, triggers } = levelJson;
+
+        this.#status = 'loaded';
+        this.#width = width;
+        this.#height = height;
+        this.#mobius = mobius;
+        this.#nextLevel = nextLevel ?? null;
+        this.#goalPosition = goalPosition;
+
+        this.#tiles = [];
+        for (const { position: [tileX, tileY], width, height } of tiles) {
+            const w = width ?? 2;
+            const h = height ?? 2;
+
+            for (let y = 0; y < h; y++) {
+                const pieceY = y === 0 ? 'bottom' : y === h - 1 ? 'top' : '';
+                for (let x = 0; x < w; x++) {
+                    const pieceX = x === 0 ? 'left' : x === w - 1 ? 'right' : '';
+                    
+                    this.#tiles.push([
+                        WorldSpaceCoordinate.from(tileX + x),
+                        WorldSpaceCoordinate.from(tileY + y),
+                        [pieceY, pieceX].filter(s => !!s).join('-') as any || 'center'
+                    ]);
+                }
+            }
+        }
+
+        this.#staticSprites = [];
+        for (const [name, x, y, w, h] of staticSprites ?? []) {
+            const sprite = new StaticSprite(name);
+            sprite.initialize([x, y], [w, h], [width, height], mobius);
+
+            this.#staticSprites.push(sprite);
+        }
+
+        this.#triggers = [];
+        for (const trigger of triggers ?? []) {
+            this.#triggers.push(TriggerFactory.create(trigger, [width, height], mobius));
+        }
+        
+        this.#player.x = startPosition[0];
+        this.#player.y = startPosition[1];
+        this.#start.initialize(startPosition, [startSize, startSize], [width, height], mobius);
+        this.#goal.type = goalType;
     }
 
     #updatePlayer(deltaTime: number): void {
@@ -275,9 +285,7 @@ export default class Level {
 
     static readonly g = 100;
     update(deltaTime: number, input: Input): void {
-        this.#debugFlipFlop.processInput(input);
-
-        this.#player.processInput(input);
+        this.#processInput(input);
         this.#updatePlayer(deltaTime);
 
         this.#triggers.forEach(trigger => {
@@ -287,6 +295,14 @@ export default class Level {
         });
 
         this.#goal.animate(deltaTime);
+    }
+
+    #processInput(input: Input) {
+        if (input.restart.pressed && !input.restart.repeat && this.#levelJson)
+            this.#initialize(this.#levelJson);
+
+        this.#debugFlipFlop.processInput(input);
+        this.#player.processInput(input);
     }
 
     render(renderer: Renderer): void {

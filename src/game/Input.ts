@@ -24,12 +24,17 @@ export default class Input {
         return this.#debug;
     }
 
+    get restart(): KeyState {
+        return this.#restart;
+    }
+
     update() {
         this.#updateKeyState(this.#left);
         this.#updateKeyState(this.#right);
         this.#updateKeyState(this.#jump);
         this.#updateKeyState(this.#pause);
         this.#updateKeyState(this.#debug);
+        this.#updateKeyState(this.#restart);
     }
     
     readonly #left = getDefaultKeyState();
@@ -37,6 +42,7 @@ export default class Input {
     readonly #jump = getDefaultKeyState();
     readonly #pause = getDefaultKeyState();
     readonly #debug = getDefaultKeyState();
+    readonly #restart = getDefaultKeyState();
 
     #getEventListener(value: boolean): (e: KeyboardEvent) => void {
         return e => {
@@ -63,6 +69,10 @@ export default class Input {
 
                 case 'q':
                     action = this.#debug;
+                    break;
+
+                case 'r':
+                    action = this.#restart;
                     break;
             }
 
