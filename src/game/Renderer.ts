@@ -2,6 +2,8 @@ import { TypeExhaustionError } from '../utils/Errors';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
 import type Sprite from './Sprite';
+import type TileSheet from './TileSheet';
+import type { TilePiece } from './TileSheet';
 
 export default class Renderer {
     #container: HTMLElement;
@@ -40,7 +42,6 @@ export default class Renderer {
     }
 
     beginFrame() {
-        // this.#context.imageSmoothingEnabled = false;
         this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 
@@ -110,6 +111,17 @@ export default class Renderer {
             sprite.image,
             ...sprite.subImageParameters,
             x, y, w, h
+        );
+    }
+
+    renderTile(tile: TileSheet, piece: TilePiece, position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>) {
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
+        const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
+
+        this.#context.drawImage(
+            tile.image,
+            ...tile.getTilePieceBoundaries(piece),
+            x, y < 0 ? -y : y, w, h
         );
     }
 
