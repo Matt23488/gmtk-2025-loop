@@ -204,7 +204,7 @@ export default class Level {
             else
                 this.#player.sprite.playAnimation(0);
         } else
-            this.#player.sprite.playAnimation(0);//2);
+            this.#player.sprite.playAnimation(2);
 
         this.#player.sprite.animate(deltaTime);
     }
