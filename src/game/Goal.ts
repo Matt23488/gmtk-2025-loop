@@ -1,6 +1,3 @@
-import friendPng from '/Goal/Friend.png';
-import strangersWingPng from '/Goal/StrangersWing.png';
-import seedPng from '/Goal/Seed.png';
 import { WorldSpaceCoordinate } from './Camera';
 import { getImage } from '../utils';
 import { TypeExhaustionError } from '../utils/Errors';
@@ -21,6 +18,9 @@ export default class Goal {
             case 'friend': return friendImg;
             case 'strangers-wing': return strangersWingImg;
             case 'seed': return seedImg;
+            case 'giants-eye': return giantsEyeImg;
+            case 'sea-artifact': return seaArtifactImg;
+            case 'huge-arrow': return hugeArrowImg;
             default:
                 throw new TypeExhaustionError('GoalType', this.type);
         }
@@ -51,7 +51,14 @@ export default class Goal {
     #animationDeltaTime = 0;
 }
 
-export type GoalType = 'friend' | 'strangers-wing' | 'seed';
+export type GoalType = 'friend' | 'strangers-wing' | 'seed' | 'giants-eye' | 'sea-artifact' | 'huge-arrow';
+
+import friendPng from '/Goal/Friend.png';
+import strangersWingPng from '/Goal/StrangersWing.png';
+import seedPng from '/Goal/Seed.png';
+import giantsEyePng from '/Goal/GiantsEye.png';
+import seaArtifactPng from '/Goal/SeaArtifact.png';
+import hugeArrowPng from '/Goal/HugeArrow.png';
 
 const size = 1;
 const width = WorldSpaceCoordinate.from(size);
@@ -65,3 +72,6 @@ const amplitude = 0.1; // world space
 const friendImg = getImage(friendPng);
 const strangersWingImg = getImage(strangersWingPng);
 const seedImg = getImage(seedPng);
+const giantsEyeImg = getImage(giantsEyePng);
+const seaArtifactImg = getImage(seaArtifactPng);
+const hugeArrowImg = getImage(hugeArrowPng);
