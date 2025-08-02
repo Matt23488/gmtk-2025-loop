@@ -60,7 +60,7 @@ import giantsEyePng from '/Goal/GiantsEye.png';
 import seaArtifactPng from '/Goal/SeaArtifact.png';
 import hugeArrowPng from '/Goal/HugeArrow.png';
 
-const size = 1;
+const size = 1.5;
 const width = WorldSpaceCoordinate.from(size);
 const height = WorldSpaceCoordinate.from(size);
 

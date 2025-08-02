@@ -255,38 +255,12 @@ export default class Level {
 
     render(renderer: Renderer): void {
         this.#renderBackground(renderer);
+        this.#renderLoopBoundary(renderer);
         this.#renderGround(renderer);
         this.#renderTiles(renderer);
         this.#renderStart(renderer);
         this.#renderGoal(renderer);
         this.#renderPlayer(renderer);
-
-        if (this.#debugFlipFlop.isSet) {
-            renderer.renderLine(
-                [
-                    WorldSpaceCoordinate.from(0),
-                    WorldSpaceCoordinate.from(0),
-                ],
-                [
-                    WorldSpaceCoordinate.from(0),
-                    WorldSpaceCoordinate.from(this.height),
-                ],
-                'rgb(0, 255, 0)',
-                5
-            );
-            renderer.renderLine(
-                [
-                    WorldSpaceCoordinate.from(this.#width),
-                    WorldSpaceCoordinate.from(0),
-                ],
-                [
-                    WorldSpaceCoordinate.from(this.#width),
-                    WorldSpaceCoordinate.from(this.height),
-                ],
-                'rgb(0, 255, 0)',
-                5
-            );
-        }
     }
 
     #renderBackground(renderer: Renderer): void {
@@ -300,6 +274,36 @@ export default class Level {
                 WorldSpaceCoordinate.from(3 * this.#width),
                 this.height,
             ]
+        );
+    }
+
+    #renderLoopBoundary(renderer: Renderer): void {
+        const color = this.#mobius ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.7)';
+
+        renderer.renderLine(
+            [
+                WorldSpaceCoordinate.from(0),
+                WorldSpaceCoordinate.from(0),
+            ],
+            [
+                WorldSpaceCoordinate.from(0),
+                WorldSpaceCoordinate.from(this.height),
+            ],
+            color,
+            10
+        );
+
+        renderer.renderLine(
+            [
+                WorldSpaceCoordinate.from(this.#width),
+                WorldSpaceCoordinate.from(0),
+            ],
+            [
+                WorldSpaceCoordinate.from(this.#width),
+                WorldSpaceCoordinate.from(this.height),
+            ],
+            color,
+            10
         );
     }
 
