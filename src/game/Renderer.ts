@@ -2,9 +2,9 @@ import { TypeExhaustionError } from '../utils/Errors';
 import type Background from './Background';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
-import type Goal from './Goal';
-import type Sprite from './Sprite';
-import type { StaticImage } from './StaticSprite';
+import type Goal from './objects/Goal';
+import type Sprite from './objects/Sprite';
+import type { StaticImage } from './objects/StaticSprite';
 import type TileSheet from './TileSheet';
 import type { TilePiece } from './TileSheet';
 
@@ -189,7 +189,7 @@ export default class Renderer {
         this.#context.textAlign = 'left';
         this.#context.textBaseline = 'top';
         this.#context.fillStyle = 'white';
-        this.#context.fillText(`fps: ${fps.toFixed(1)}`, 20, 20);
+        this.#context.fillText(`fps: ${fps.toFixed(0)}`, 20, 20);
     }
 
     #renderPass(pass: RenderPass, callObj: RenderCallObj) {

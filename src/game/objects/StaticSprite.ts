@@ -1,6 +1,6 @@
-import { getImage } from '../utils';
-import { WorldSpaceCoordinate } from './Camera';
-import type Renderer from './Renderer';
+import { getImage } from '../../utils';
+import { WorldSpaceCoordinate } from '../Camera';
+import type Renderer from '../Renderer';
 
 export default class StaticSprite {
 
@@ -17,6 +17,22 @@ export default class StaticSprite {
 
         this.#copyA.flipVertical = false;
         this.#copyB.flipVertical = false;
+    }
+
+    get position(): Geometry.Point<WorldSpaceCoordinate> {
+        return this.#position;
+    }
+
+    get size(): Geometry.Point<WorldSpaceCoordinate> {
+        return this.#size;
+    }
+
+    set mobius(mobius: boolean) {
+        this.#mobius = mobius;
+
+        const copyFlipState = mobius ? !this.#real.flipVertical : this.#real.flipVertical;
+        this.#copyA.flipVertical = copyFlipState;
+        this.#copyB.flipVertical = copyFlipState;
     }
 
     initialize(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>, levelSize: Geometry.Point<WorldSpaceCoordinate>, mobius: boolean) {
@@ -101,6 +117,7 @@ function getSprite(name: string) {
         case 'Start': return startImg;
         case 'UpArrow': return upArrowImg;
         case 'DownArrow': return downArrowImg;
+        case 'Rock': return rockImg;
         default: return getImage(`${import.meta.env.BASE_URL}Sprites/${name}.png`);
     }
 }
@@ -108,7 +125,9 @@ function getSprite(name: string) {
 import Start from '/Sprites/Start.png';
 import UpArrow from '/Sprites/UpArrow.png';
 import DownArrow from '/Sprites/DownArrow.png';
+import Rock from '/Sprites/Rock.png';
 
 const startImg = getImage(Start);
 const upArrowImg = getImage(UpArrow);
 const downArrowImg = getImage(DownArrow);
+const rockImg = getImage(Rock);

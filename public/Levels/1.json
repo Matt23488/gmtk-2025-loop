@@ -1,15 +1,18 @@
 {
     "width": 44,
     "height": 18,
-    "mobius": true,
+    "mobius": false,
     "nextLevel": 2,
     "goalType": "friend",
-    "startPosition": [17.5, 1],
-    "goalPosition": [12, 14],
+    "startPosition": [9.5, 1],
+    "goalPosition": [4, 14],
     "tiles": [
-        { "position": [15, 1], "height": 16 }
+        { "position": [7, 1], "height": 16 }
     ],
     "staticSprites": [
-        ["UpArrow", 12, 11, 2, 2]
+        ["UpArrow", 4, 11, 2, 2]
+    ],
+    "triggers": [
+        ["mobius-toggle", 42, 1, 2, 2]
     ]
 }

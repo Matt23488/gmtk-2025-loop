@@ -1,6 +1,6 @@
 import { WorldSpaceCoordinate } from './Camera';
 import type Input from './Input';
-import Sprite from './Sprite';
+import Sprite from './objects/Sprite';
 
 export default class Player {
     #sprite: Sprite;

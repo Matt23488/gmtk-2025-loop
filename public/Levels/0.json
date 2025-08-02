@@ -4,12 +4,12 @@
     "mobius": false,
     "nextLevel": 1,
     "goalType": "seed",
-    "startPosition": [17.5, 1],
-    "goalPosition": [12, 3],
+    "startPosition": [9.5, 1],
+    "goalPosition": [4, 3],
     "tiles": [
-        { "position": [15, 1], "height": 16 }
+        { "position": [7, 1], "height": 16 }
     ],
     "staticSprites": [
-        ["DownArrow", 12, 6, 2, 2]
+        ["DownArrow", 4, 6, 2, 2]
     ]
 }

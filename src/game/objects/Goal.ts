@@ -1,6 +1,6 @@
-import { WorldSpaceCoordinate } from './Camera';
-import { getImage } from '../utils';
-import { TypeExhaustionError } from '../utils/Errors';
+import { WorldSpaceCoordinate } from '../Camera';
+import { getImage } from '../../utils';
+import { TypeExhaustionError } from '../../utils/Errors';
 
 export default class Goal {
     type: GoalType = 'friend';

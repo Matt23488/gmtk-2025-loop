@@ -1,13 +1,16 @@
 import Background from './Background';
 import type Camera from './Camera';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
-import Goal, { type GoalType } from './Goal';
+import Goal, { type GoalType } from './objects/Goal';
 import { FlipFlop } from './Input';
 import type Input from './Input';
 import Player from './Player';
 import type Renderer from './Renderer';
-import StaticSprite from './StaticSprite';
+import StaticSprite from './objects/StaticSprite';
 import TileSheet, { type TilePiece } from './TileSheet';
+import Trigger from './objects/Trigger';
+import * as TriggerFactory from './objects/TriggerFactory';
+import type { TriggerJson } from './objects/Trigger';
 
 const startSize = WorldSpaceCoordinate.from(1.75);
 
@@ -28,6 +31,7 @@ export default class Level {
     #goalPosition: Geometry.Point<WorldSpaceCoordinate>;
     #tiles: Tile[];
     #staticSprites: StaticSprite[];
+    #triggers: Trigger[];
 
     constructor(levelNumber: number) {
         this.#player = new Player();
@@ -46,11 +50,12 @@ export default class Level {
         this.#goalPosition = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(-1)];
         this.#tiles = [];
         this.#staticSprites = [];
+        this.#triggers = [];
 
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
         fetch(url)
             .then(r => r.json())
-            .then(({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites }: LevelJson) => {
+            .then(({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites, triggers }: LevelJson) => {
                 this.#status = 'loaded';
                 this.#width = width;
                 this.#height = height;
@@ -81,6 +86,10 @@ export default class Level {
                     sprite.initialize([x, y], [w, h], [width, height], mobius);
 
                     this.#staticSprites.push(sprite);
+                }
+
+                for (const trigger of triggers ?? []) {
+                    this.#triggers.push(TriggerFactory.create(trigger, [width, height], mobius));
                 }
                 
                 this.#player.x = startPosition[0];
@@ -118,6 +127,12 @@ export default class Level {
     #flipped = false;
     get flipped(): boolean {
         return this.#flipped;
+    }
+
+    toggleMobius() {
+        this.#mobius = !this.#mobius;
+        this.#start.mobius = this.#mobius;
+        this.#staticSprites.forEach(sprite => sprite.mobius = this.#mobius);
     }
 
     #wrap() {
@@ -265,6 +280,12 @@ export default class Level {
         this.#player.processInput(input);
         this.#updatePlayer(deltaTime);
 
+        this.#triggers.forEach(trigger => {
+            if (trigger.isActivated(this.#player.position, this.#player.size)) {
+                trigger.activate(this);
+            }
+        });
+
         this.#goal.animate(deltaTime);
     }
 
@@ -272,9 +293,10 @@ export default class Level {
         this.#renderBackground(renderer);
         this.#renderLoopBoundary(renderer);
         this.#start.render(renderer);
+        this.#staticSprites.forEach(sprite => sprite.render(renderer));
+        this.#triggers.forEach(trigger => trigger.render(renderer));
         this.#renderGround(renderer);
         this.#renderTiles(renderer);
-        this.#renderStaticSprites(renderer);
         this.#renderGoal(renderer);
         this.#renderPlayer(renderer);
     }
@@ -367,11 +389,6 @@ export default class Level {
             );
     }
 
-    #renderStaticSprites(renderer: Renderer) {
-        for (const sprite of this.#staticSprites)
-            sprite.render(renderer);
-    }
-
     #renderGoal(renderer: Renderer) {
 
         const [worldX, worldY] = this.#goalPosition;
@@ -412,7 +429,8 @@ interface LevelJson {
     startPosition: Geometry.Point<WorldSpaceCoordinate>;
     goalPosition: Geometry.Point<WorldSpaceCoordinate>;
     tiles: TileJson[];
-    staticSprites?: StaticSpriteJson[];
+    staticSprites?: TriggerJson[];
+    triggers?: TriggerJson[];
 }
 
 interface TileJson {
@@ -420,5 +438,3 @@ interface TileJson {
     width?: WorldSpaceCoordinate;
     height?: WorldSpaceCoordinate;
 }
-
-type StaticSpriteJson = [name: string, x: WorldSpaceCoordinate, y: WorldSpaceCoordinate, w: WorldSpaceCoordinate, h: WorldSpaceCoordinate];

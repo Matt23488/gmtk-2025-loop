@@ -1,0 +1,11 @@
+{
+    "width": 24,
+    "height": 18,
+    "mobius": false,
+    "goalType": "giants-eye",
+    "startPosition": [3, 1],
+    "goalPosition": [11, 5],
+    "tiles": [
+        { "position": [5, 1], "width": 10, "height": 3 }
+    ]
+}
