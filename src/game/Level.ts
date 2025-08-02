@@ -13,6 +13,7 @@ export default class Level {
     #player: Player;
     #dirtTiles: TileSheet;
     #goal: Goal;
+    #pauseManager: PauseManager;
 
     #status: Utils.LoadStatus;
     #width: WorldSpaceCoordinate;
@@ -27,6 +28,7 @@ export default class Level {
         this.#player = new Player();
         this.#dirtTiles = new TileSheet('Dirt');
         this.#goal = new Goal();
+        this.#pauseManager = new PauseManager();
 
         this.#status = 'loading';
         this.#width = WorldSpaceCoordinate.from(16);
@@ -224,23 +226,10 @@ export default class Level {
         return (inLeftRange && inRightRange) && (inBottonRange && inTopRange);
     }
 
-    #paused = false;
-    #_pausePressed = false;
-    get #pausePressed(): boolean {
-        return this.#_pausePressed;
-    }
-
-    set #pausePressed(value: boolean) {
-        if (value && !this.#_pausePressed)
-            this.#paused = !this.#paused;
-
-        this.#_pausePressed = value;
-    }
-
     static readonly g = 100;
     update(deltaTime: number, input: Input): void {
-        this.#pausePressed = input.pausePressed;
-        if (this.#paused)
+        this.#pauseManager.processInput(input);
+        if (this.#pauseManager.paused)
             return;
 
         this.#player.processInput(input);
@@ -359,6 +348,26 @@ export default class Level {
 
     #shouldFlipY(copy: boolean) {
         return (this.#flipped && !copy) || (!this.#flipped && copy && this.#mobius);
+    }
+}
+
+class PauseManager {
+    #paused = false;
+    #pauseBtnPressed = false;
+
+    get paused(): boolean {
+        return this.#paused;
+    }
+
+    processInput(input: Input) {
+        this.#processPauseInput(input.pausePressed);
+    }
+
+    #processPauseInput(pressed: boolean) {
+        if (pressed && !this.#pauseBtnPressed)
+            this.#paused = !this.#paused;
+
+        this.#pauseBtnPressed = pressed;
     }
 }
 
