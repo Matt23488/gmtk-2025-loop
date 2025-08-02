@@ -25,3 +25,11 @@ body {
   place-items: center;
   position: relative;
 }
+
+.btn {
+    background-color: transparent;
+    padding: 0.5em 1em;
+    border: 3px solid currentColor;
+    border-radius: 5px;
+    cursor: pointer;
+}

@@ -13,7 +13,6 @@ export default abstract class HtmlScreen extends GameScreen {
     }
 
     protected abstract get template(): HtmlTemplate;
-    protected get cssUrl(): string | null { return null; }
     protected initialize(_container: HTMLElement): void {}
 
     protected transitionTo(screen: GameScreen): void {
@@ -31,14 +30,6 @@ export default abstract class HtmlScreen extends GameScreen {
         screenContainer.style.textAlign = 'center';
 
         screenContainer.innerHTML = this.template.get;
-
-        if (this.cssUrl !== null) {
-            const styles = document.createElement('link');
-            styles.rel = 'stylesheet';
-            styles.href = this.cssUrl;
-
-            screenContainer.prepend(styles);
-        }
         
         this.container.appendChild(screenContainer);
         this.initialize(screenContainer);
