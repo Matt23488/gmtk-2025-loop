@@ -34,6 +34,10 @@ body {
   cursor: pointer;
 }
 
+.btn:focus {
+  outline: 10px solid purple;
+}
+
 .pause {
   position: fixed;
   inset: 0;

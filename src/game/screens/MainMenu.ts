@@ -14,5 +14,6 @@ export default class MainMenu extends HtmlScreen {
         const playBtn = container.querySelector<HTMLButtonElement>('#mainMenu__playBtn')!;
 
         playBtn.addEventListener('click', () => this.transitionTo(new InGame(this.container)));
+        playBtn.focus();
     }
 }
