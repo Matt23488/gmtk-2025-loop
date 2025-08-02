@@ -1,12 +1,12 @@
 {
-    "width": 24,
+    "width": 44,
     "height": 18,
     "mobius": false,
     "nextLevel": 1,
     "goalType": "seed",
-    "startPosition": [9.5, 1],
-    "goalPosition": [4, 3],
+    "startPosition": [17.5, 1],
+    "goalPosition": [12, 3],
     "tiles": [
-        { "position": [7, 1], "height": 16 }
+        { "position": [15, 1], "height": 16 }
     ]
 }

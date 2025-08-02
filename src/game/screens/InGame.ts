@@ -6,6 +6,8 @@ import Level from '../Level';
 import type Renderer from '../Renderer';
 import MainMenu from './MainMenu';
 
+const startingLevel = 0;
+
 export default class InGame extends GameScreen {
     #currentLevel: Level;
     #camera: Camera;
@@ -75,8 +77,6 @@ export default class InGame extends GameScreen {
         this.#currentLevel.debugEnabled = this.#debugFlipFlop.isSet;
     }
 }
-
-const startingLevel = 2;
 
 class PauseManager {
     constructor() {
