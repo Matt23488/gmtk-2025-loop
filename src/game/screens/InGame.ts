@@ -1,6 +1,6 @@
 import Camera from '../Camera';
 import GameScreen from '../GameScreen';
-import type { KeyState } from '../Input';
+import { FlipFlop } from '../Input';
 import type Input from '../Input';
 import Level from '../Level';
 import type Renderer from '../Renderer';
@@ -10,6 +10,7 @@ export default class InGame extends GameScreen {
     #currentLevel: Level;
     #camera: Camera;
     #pauseManager: PauseManager;
+    #debugFlipFlop: FlipFlop;
 
     constructor(container: HTMLElement) {
         super(container);
@@ -17,6 +18,7 @@ export default class InGame extends GameScreen {
         this.#currentLevel = new Level(startingLevel);
         this.#camera = new Camera(this.#currentLevel);
         this.#pauseManager = new PauseManager();
+        this.#debugFlipFlop = new FlipFlop('debug');
     }
 
     #fps = 0;
@@ -26,6 +28,8 @@ export default class InGame extends GameScreen {
         this.#pauseManager.processInput(input);
         if (this.#pauseManager.paused)
             return;
+
+        this.#debugFlipFlop.processInput(input);
 
         this.#currentLevel.update(deltaTime, input);
         this.#currentLevel.centerCameraAtPlayer(this.#camera);
@@ -61,43 +65,46 @@ export default class InGame extends GameScreen {
             );
         }
 
-        renderer.renderFps(this.#fps);
+        if (this.#debugFlipFlop.isSet)
+            renderer.renderFps(this.#fps);
     }
 
     #transitionLevel(levelNum: number) {
         this.#currentLevel = new Level(levelNum);
         this.#camera = new Camera(this.#currentLevel);
+        this.#currentLevel.debugEnabled = this.#debugFlipFlop.isSet;
     }
 }
 
 const startingLevel = 2;
 
 class PauseManager {
+    constructor() {
+        this.#pauseFlipFlop = new FlipFlop('pause');
+        this.#modal = null;
+
+        this.#pauseFlipFlop.onSet = () => {
+            this.#modal = document.createElement('div');
+            this.#modal.classList.add('pause');
+            this.#modal.textContent = 'Paused';
+
+            document.body.appendChild(this.#modal);
+        };
+
+        this.#pauseFlipFlop.onReset = () => {
+            this.#modal?.remove();
+            this.#modal = null;
+        };
+    }
+
     get paused(): boolean {
-        return this.#paused;
+        return this.#pauseFlipFlop.isSet;
     }
 
     processInput(input: Input) {
-        this.#processPauseInput(input.pause);
+        this.#pauseFlipFlop.processInput(input);
     }
     
-    #paused = false;
-    #modal: HTMLDivElement | null = null;
-
-    #processPauseInput(pause: KeyState) {
-        if (pause.pressed && !pause.repeat) {
-            this.#paused = !this.#paused;
-
-            if (this.#paused) {
-                this.#modal = document.createElement('div');
-                this.#modal.classList.add('pause');
-                this.#modal.textContent = 'Paused';
-
-                document.body.appendChild(this.#modal);
-            } else {
-                this.#modal!.remove();
-                this.#modal = null;
-            }
-        }
-    }
+    #pauseFlipFlop: FlipFlop;
+    #modal: HTMLDivElement | null;
 }

@@ -81,9 +81,46 @@ export default class Input {
             state.pressed = false;
             state.repeat = false;
         }
-        // if (state.pressed)
-        //     state.repeat = true;
     }
+}
+
+export type InputType = Exclude<keyof Input, 'update'>;
+
+export class FlipFlop {
+    onSet = () => {};
+    onReset = () => {};
+
+    constructor(inputType: InputType) {
+        this.#inputType = inputType;
+        this.#value = false;
+    }
+
+    get isSet(): boolean {
+        return this.#value;
+    }
+
+    set isSet(value: boolean) {
+        this.#value = value;
+        if (value)
+            this.onSet();
+        else
+            this.onReset();
+    }
+
+    processInput(input: Input) {
+        const key = input[this.#inputType];
+
+        if (key.pressed && !key.repeat) {
+            this.#value = !this.#value;
+            if (this.#value)
+                this.onSet();
+            else
+                this.onReset();
+        }
+    }
+    
+    #inputType: InputType;
+    #value = false;
 }
 
 function getDefaultKeyState(): MutableKeyState {

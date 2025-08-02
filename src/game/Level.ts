@@ -2,6 +2,7 @@ import Background from './Background';
 import type Camera from './Camera';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Goal, { type GoalType } from './Goal';
+import { FlipFlop } from './Input';
 import type Input from './Input';
 import Player from './Player';
 import type Renderer from './Renderer';
@@ -12,6 +13,7 @@ export default class Level {
     #dirtTiles: TileSheet;
     #goal: Goal;
     #background: Background;
+    #debugFlipFlop: FlipFlop;
 
     #levelNumber: number;
     #status: Utils.LoadStatus;
@@ -28,6 +30,7 @@ export default class Level {
         this.#dirtTiles = new TileSheet('Dirt');
         this.#goal = new Goal();
         this.#background = new Background();
+        this.#debugFlipFlop = new FlipFlop('debug');
 
         this.#levelNumber = levelNumber;
         this.#status = 'loading';
@@ -76,20 +79,28 @@ export default class Level {
             .catch(() => this.#status = 'error');
     }
 
-    public get levelNumber(): number {
+    get levelNumber(): number {
         return this.#levelNumber;
     }
 
-    public get status(): Utils.LoadStatus {
+    get status(): Utils.LoadStatus {
         return this.#status;
     }
 
-    public get height(): WorldSpaceCoordinate {
+    get height(): WorldSpaceCoordinate {
         return this.#height;
     }
 
-    public get nextLevel(): number | null {
+    get nextLevel(): number | null {
         return this.#nextLevel;
+    }
+
+    get debugEnabled(): boolean {
+        return this.#debugFlipFlop.isSet;
+    }
+
+    set debugEnabled(enabled: boolean) {
+        this.#debugFlipFlop.isSet = enabled;
     }
 
     #flipped = false;
@@ -234,6 +245,7 @@ export default class Level {
 
     static readonly g = 100;
     update(deltaTime: number, input: Input): void {
+        this.#debugFlipFlop.processInput(input);
 
         this.#player.processInput(input);
         this.#updatePlayer(deltaTime);
@@ -248,6 +260,33 @@ export default class Level {
         this.#renderStart(renderer);
         this.#renderGoal(renderer);
         this.#renderPlayer(renderer);
+
+        if (this.#debugFlipFlop.isSet) {
+            renderer.renderLine(
+                [
+                    WorldSpaceCoordinate.from(0),
+                    WorldSpaceCoordinate.from(0),
+                ],
+                [
+                    WorldSpaceCoordinate.from(0),
+                    WorldSpaceCoordinate.from(this.height),
+                ],
+                'rgb(0, 255, 0)',
+                5
+            );
+            renderer.renderLine(
+                [
+                    WorldSpaceCoordinate.from(this.#width),
+                    WorldSpaceCoordinate.from(0),
+                ],
+                [
+                    WorldSpaceCoordinate.from(this.#width),
+                    WorldSpaceCoordinate.from(this.height),
+                ],
+                'rgb(0, 255, 0)',
+                5
+            );
+        }
     }
 
     #renderBackground(renderer: Renderer): void {

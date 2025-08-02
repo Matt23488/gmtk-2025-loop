@@ -65,6 +65,19 @@ export default class Renderer {
         ];
     }
 
+    renderLine(start: Geometry.Point<WorldSpaceCoordinate>, end: Geometry.Point<WorldSpaceCoordinate>, style: string, width: number) {
+        const [startX, startY] = this.camera.transformPoint(start, this.screenDimensions);
+        const [endX, endY] = this.camera.transformPoint(end, this.screenDimensions);
+
+        this.#context.strokeStyle = style;
+        this.#context.lineWidth = width;
+
+        this.#context.beginPath();
+        this.#context.moveTo(startX, startY);
+        this.#context.lineTo(endX, endY);
+        this.#context.stroke();
+    }
+
     renderRect(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>, ...passes: RenderPass[]) {
         const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
         const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
