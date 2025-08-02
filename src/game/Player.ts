@@ -88,7 +88,7 @@ export default class Player {
             return;
 
         this.onGround = false;
-        this.velocityY = WorldSpaceCoordinate.from(25);
+        this.velocityY = WorldSpaceCoordinate.from(27);
     }
 
     processInput(input: Input) {

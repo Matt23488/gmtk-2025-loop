@@ -62,4 +62,4 @@ export default class InGame extends GameScreen {
     }
 }
 
-const startingLevel = 0;
+const startingLevel = 2;

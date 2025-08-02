@@ -5,7 +5,7 @@
     "nextLevel": 1,
     "goalType": "seed",
     "startPosition": [9, 1],
-    "goalPosition": [6, 1],
+    "goalPosition": [4, 3],
     "tiles": [
         { "position": [7, 1], "height": 16 }
     ]

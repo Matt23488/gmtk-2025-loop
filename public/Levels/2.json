@@ -5,7 +5,7 @@
     "nextLevel": 0,
     "goalType": "strangers-wing",
     "startPosition": [3, 1],
-    "goalPosition": [7, 1],
+    "goalPosition": [11, 2],
     "tiles": [
         { "position": [5, 1] },
         { "position": [7, 3] },
@@ -13,7 +13,6 @@
         { "position": [0, 11], "width": 17 },
         { "position": [22, 7], "height": 10 },
         { "position": [0, 1], "height": 10 },
-        { "position": [18, 7] },
-        { "position": [20, 9] }
+        { "position": [19, 7], "width": 3, "height": 3 }
     ]
 }
