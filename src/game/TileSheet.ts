@@ -1,3 +1,4 @@
+import { getImage } from '../utils';
 import { TypeExhaustionError } from '../utils/Errors';
 import { WorldSpaceCoordinate } from './Camera';
 
@@ -9,12 +10,10 @@ export default class TileSheet {
     constructor(name: string) {
         const url = `${import.meta.env.BASE_URL}Tiles/${name}.png`;
 
-        this.#img = document.createElement('img');
-        this.#img.src = url;
-        this.#img.onload = () => {
+        this.#img = getImage(url, () => {
             this.#width = this.#img.naturalWidth / 3;
             this.#height = this.#img.naturalHeight / 3;
-        };
+        });
 
         this.#width = 1;
         this.#height = 1;

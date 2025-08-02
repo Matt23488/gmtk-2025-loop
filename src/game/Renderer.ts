@@ -1,6 +1,7 @@
 import { TypeExhaustionError } from '../utils/Errors';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
+import type Goal from './Goal';
 import type Sprite from './Sprite';
 import type TileSheet from './TileSheet';
 import type { TilePiece } from './TileSheet';
@@ -121,6 +122,16 @@ export default class Renderer {
         this.#context.drawImage(
             tile.image,
             ...tile.getTilePieceBoundaries(piece),
+            x, y, w, h
+        );
+    }
+
+    renderGoal(goal: Goal, position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>) {
+        const [x, y] = this.camera.transformPoint(goal.offset(position), this.screenDimensions);
+        const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
+
+        this.#context.drawImage(
+            goal.image,
             x, y, w, h
         );
     }

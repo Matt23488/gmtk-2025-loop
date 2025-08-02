@@ -1,5 +1,6 @@
 import type Camera from './Camera';
 import { WorldSpaceCoordinate } from './Camera';
+import Goal, { type GoalType } from './Goal';
 import type Input from './Input';
 import Player from './Player';
 import type Renderer from './Renderer';
@@ -8,6 +9,7 @@ import TileSheet, { type TilePiece } from './TileSheet';
 export default class Level {
     #player: Player;
     #dirtTiles: TileSheet;
+    #goal: Goal;
 
     #status: Utils.LoadStatus;
     #width: WorldSpaceCoordinate;
@@ -21,6 +23,7 @@ export default class Level {
     constructor(levelNumber: number) {
         this.#player = new Player();
         this.#dirtTiles = new TileSheet('Dirt');
+        this.#goal = new Goal();
 
         this.#status = 'loading';
         this.#width = WorldSpaceCoordinate.from(16);
@@ -34,7 +37,7 @@ export default class Level {
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
         fetch(url)
             .then(r => r.json())
-            .then(({ width, height, mobius, nextLevel, startPosition, goalPosition, tiles }: LevelJson) => {
+            .then(({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles }: LevelJson) => {
                 this.#status = 'loaded';
                 this.#width = width;
                 this.#height = height;
@@ -46,6 +49,7 @@ export default class Level {
                 
                 this.#player.x = startPosition[0];
                 this.#player.y = startPosition[1];
+                this.#goal.type = goalType;
             })
             .catch(() => this.#status = 'error');
     }
@@ -221,6 +225,8 @@ export default class Level {
 
         this.#player.processInput(input);
         this.#updatePlayer(deltaTime);
+
+        this.#goal.animate(deltaTime);
     }
 
     render(renderer: Renderer): void {
@@ -245,7 +251,7 @@ export default class Level {
                     passes: [
                         {
                             type: 'fill',
-                            style: 'rgb(48, 29, 0)',
+                            style: 'rgba(51, 46, 41, 1)',
                         },
                     ],
                 }
@@ -300,68 +306,36 @@ export default class Level {
             );
     }
 
-    #renderStart(renderer: Renderer) {
-
-        const [worldX, worldY] = this.#startPosition;
-
-        const correctedX = worldX + 0.5;
-        const correctedY = worldY + 0.5;
-
-        for (let i = -1; i <= 1; i++)
-            renderer.renderCircle(
-                [
-                    WorldSpaceCoordinate.from(correctedX + i * this.#width),
-                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0 && this.#mobius) ? this.#height - correctedY : correctedY),
-                ],
-                WorldSpaceCoordinate.from(0.3),
-                {
-                    passes: [
-                        {
-                            type: 'fill',
-                            style: 'rgb(0, 100, 0)',
-                        },
-                        {
-                            type: 'stroke',
-                            style: 'black',
-                            width: 2,
-                        },
-                    ],
-                }
-            );
+    #renderStart(_renderer: Renderer) {
+        // TODO
     }
 
     #renderGoal(renderer: Renderer) {
 
         const [worldX, worldY] = this.#goalPosition;
 
-        const correctedX = worldX + 0.5;
-        const correctedY = worldY + 0.5;
+        const flippedY = this.#height - worldY - 1;
+
+        const offsetX = (1 - this.#goal.width) / 2;
+        const offsetY = (1 - this.#goal.height) / 2;
 
         for (let i = -1; i <= 1; i++)
-            renderer.renderCircle(
+            renderer.renderGoal(
+                this.#goal,
                 [
-                    WorldSpaceCoordinate.from(correctedX + i * this.#width),
-                    WorldSpaceCoordinate.from((this.#flipped && i === 0) || (!this.#flipped && i !== 0 && this.#mobius) ? this.#height - correctedY : correctedY),
+                    WorldSpaceCoordinate.from(worldX + i * this.#width + offsetX),
+                    WorldSpaceCoordinate.from((this.#shouldFlipY(i !== 0) ? flippedY : worldY) + offsetY),
                 ],
-                WorldSpaceCoordinate.from(0.3),
-                {
-                    passes: [
-                        {
-                            type: 'fill',
-                            style: 'rgba(153, 0, 153, 1)',
-                        },
-                        {
-                            type: 'stroke',
-                            style: 'black',
-                            width: 2,
-                        },
-                    ],
-                }
+                this.#goal.size
             );
     }
 
     #renderPlayer(renderer: Renderer) {
         renderer.renderSprite(this.#player.sprite, this.#player.position, this.#player.size);
+    }
+
+    #shouldFlipY(copy: boolean) {
+        return (this.#flipped && !copy) || (!this.#flipped && copy && this.#mobius);
     }
 }
 
@@ -370,6 +344,7 @@ interface LevelJson {
     height: WorldSpaceCoordinate;
     mobius: boolean;
     nextLevel?: number;
+    goalType: GoalType;
     startPosition: Geometry.Point<WorldSpaceCoordinate>;
     goalPosition: Geometry.Point<WorldSpaceCoordinate>;
     tiles: TileJson[];

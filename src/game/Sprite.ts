@@ -1,19 +1,13 @@
+import { getImage } from '../utils';
+
 export default class Sprite {
-    #name: string;
-    #status: Utils.LoadStatus;
-    #spriteSheet: HTMLImageElement;
-    #width: number;
-    #height: number;
-    #animations: AnimationJson[];
-    #animation: AnimationJson;
-    #animationIndex = -1;
-    #animationFrame = 0;
-    #animationDeltaTime = 0;
+    flipHorizontal = false;
+    flipVertical = false;
 
     constructor(name: string) {
         this.#name = name;
         this.#status = 'loading';
-        this.#spriteSheet = this.#loadImage(name);
+        this.#spriteSheet = getImage(`${import.meta.env.BASE_URL}Sprites/${name}.png`);
         this.#width = 1;
         this.#height = 1;
         this.#animations = [];
@@ -69,17 +63,16 @@ export default class Sprite {
         this.#animationDeltaTime = animationDeltaTime;
     }
 
-    #loadImage(name: string): HTMLImageElement {
-        const img = document.createElement('img');
-        img.src = `${import.meta.env.BASE_URL}Sprites/${name}.png`;;
-        img.onload = () => {};
-
-        return img;
-    }
-
-    flipHorizontal = false;
-    flipVertical = false;
-
+    #name: string;
+    #status: Utils.LoadStatus;
+    #spriteSheet: HTMLImageElement;
+    #width: number;
+    #height: number;
+    #animations: AnimationJson[];
+    #animation: AnimationJson;
+    #animationIndex = -1;
+    #animationFrame = 0;
+    #animationDeltaTime = 0;
 }
 
 interface SpriteJson {

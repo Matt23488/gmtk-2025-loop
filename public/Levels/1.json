@@ -2,6 +2,8 @@
     "width": 24,
     "height": 18,
     "mobius": true,
+    "nextLevel": 2,
+    "goalType": "friend",
     "startPosition": [9, 1],
     "goalPosition": [6, 16],
     "tiles": [
