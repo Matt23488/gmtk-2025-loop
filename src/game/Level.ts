@@ -27,6 +27,7 @@ export default class Level {
     #nextLevel: number | null;
     #goalPosition: Geometry.Point<WorldSpaceCoordinate>;
     #tiles: Tile[];
+    #staticSprites: StaticSprite[];
 
     constructor(levelNumber: number) {
         this.#player = new Player();
@@ -44,11 +45,12 @@ export default class Level {
         this.#nextLevel = null;
         this.#goalPosition = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(-1)];
         this.#tiles = [];
+        this.#staticSprites = [];
 
         const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
         fetch(url)
             .then(r => r.json())
-            .then(({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles }: LevelJson) => {
+            .then(({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites }: LevelJson) => {
                 this.#status = 'loaded';
                 this.#width = width;
                 this.#height = height;
@@ -72,6 +74,13 @@ export default class Level {
                             ]);
                         }
                     }
+                }
+
+                for (const [name, x, y, w, h] of staticSprites ?? []) {
+                    const sprite = new StaticSprite(name);
+                    sprite.initialize([x, y], [w, h], [width, height], mobius);
+
+                    this.#staticSprites.push(sprite);
                 }
                 
                 this.#player.x = startPosition[0];
@@ -115,6 +124,7 @@ export default class Level {
         if (this.#mobius) {
             this.#flipped = !this.#flipped;
             this.#start.flip();
+            this.#staticSprites.forEach(sprite => sprite.flip());
         }
     }
 
@@ -264,6 +274,7 @@ export default class Level {
         this.#start.render(renderer);
         this.#renderGround(renderer);
         this.#renderTiles(renderer);
+        this.#renderStaticSprites(renderer);
         this.#renderGoal(renderer);
         this.#renderPlayer(renderer);
     }
@@ -356,6 +367,11 @@ export default class Level {
             );
     }
 
+    #renderStaticSprites(renderer: Renderer) {
+        for (const sprite of this.#staticSprites)
+            sprite.render(renderer);
+    }
+
     #renderGoal(renderer: Renderer) {
 
         const [worldX, worldY] = this.#goalPosition;
@@ -396,6 +412,7 @@ interface LevelJson {
     startPosition: Geometry.Point<WorldSpaceCoordinate>;
     goalPosition: Geometry.Point<WorldSpaceCoordinate>;
     tiles: TileJson[];
+    staticSprites?: StaticSpriteJson[];
 }
 
 interface TileJson {
@@ -403,3 +420,5 @@ interface TileJson {
     width?: WorldSpaceCoordinate;
     height?: WorldSpaceCoordinate;
 }
+
+type StaticSpriteJson = [name: string, x: WorldSpaceCoordinate, y: WorldSpaceCoordinate, w: WorldSpaceCoordinate, h: WorldSpaceCoordinate];

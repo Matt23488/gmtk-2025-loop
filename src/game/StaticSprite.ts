@@ -10,7 +10,7 @@ export default class StaticSprite {
         this.#mobius = false;
         this.#size = [WorldSpaceCoordinate.from(1), WorldSpaceCoordinate.from(1)];
 
-        this.#image = getImage(`${import.meta.env.BASE_URL}Sprites/${name}.png`);
+        this.#image = getSprite(name);
         this.#real = new StaticImage(this.#image);
         this.#copyA = new StaticImage(this.#image);
         this.#copyB = new StaticImage(this.#image);
@@ -95,3 +95,20 @@ export class StaticImage {
     #width: WorldSpaceCoordinate;
     #height: WorldSpaceCoordinate;
 }
+
+function getSprite(name: string) {
+    switch (name) {
+        case 'Start': return startImg;
+        case 'UpArrow': return upArrowImg;
+        case 'DownArrow': return downArrowImg;
+        default: return getImage(`${import.meta.env.BASE_URL}Sprites/${name}.png`);
+    }
+}
+
+import Start from '/Sprites/Start.png';
+import UpArrow from '/Sprites/UpArrow.png';
+import DownArrow from '/Sprites/DownArrow.png';
+
+const startImg = getImage(Start);
+const upArrowImg = getImage(UpArrow);
+const downArrowImg = getImage(DownArrow);

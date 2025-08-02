@@ -8,5 +8,8 @@
     "goalPosition": [12, 14],
     "tiles": [
         { "position": [15, 1], "height": 16 }
+    ],
+    "staticSprites": [
+        ["UpArrow", 12, 11, 2, 2]
     ]
 }
