@@ -7,9 +7,6 @@
     "startPosition": [9, 1],
     "goalPosition": [6, 16],
     "tiles": [
-        { "position": [2, 10], "piece": "center" }, { "position": [4, 10], "piece": "center" },
-        { "position": [1, 8], "piece": "center" }, { "position": [2, 7], "piece": "center" }, { "position": [3, 7], "piece": "center" }, { "position": [4, 7], "piece": "center" }, { "position": [5, 8], "piece": "center" },
-        { "position": [7, 1], "piece": "left" }, { "position": [7, 2], "piece": "left" }, { "position": [7, 3], "piece": "left" }, { "position": [7, 4], "piece": "left" }, { "position": [7, 5], "piece": "left" }, { "position": [7, 6], "piece": "left" }, { "position": [7, 7], "piece": "left" }, { "position": [7, 8], "piece": "left" }, { "position": [7, 9], "piece": "left" }, { "position": [7, 10], "piece": "left" }, { "position": [7, 11], "piece": "left" }, { "position": [7, 12], "piece": "left" }, { "position": [7, 13], "piece": "left" }, { "position": [7, 14], "piece": "left" }, { "position": [7, 15], "piece": "left" }, { "position": [7, 16], "piece": "left" },
-        { "position": [8, 1], "piece": "right" }, { "position": [8, 2], "piece": "right" }, { "position": [8, 3], "piece": "right" }, { "position": [8, 4], "piece": "right" }, { "position": [8, 5], "piece": "right" }, { "position": [8, 6], "piece": "right" }, { "position": [8, 7], "piece": "right" }, { "position": [8, 8], "piece": "right" }, { "position": [8, 9], "piece": "right" }, { "position": [8, 10], "piece": "right" }, { "position": [8, 11], "piece": "right" }, { "position": [8, 12], "piece": "right" }, { "position": [8, 13], "piece": "right" }, { "position": [8, 14], "piece": "right" }, { "position": [8, 15], "piece": "right" }, { "position": [8, 16], "piece": "right" }
+        { "position": [7, 1], "height": 16 }
     ]
 }

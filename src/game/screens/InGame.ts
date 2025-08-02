@@ -12,7 +12,7 @@ export default class InGame extends GameScreen {
     constructor(container: HTMLElement) {
         super(container);
         
-        this.#currentLevel = new Level(0);
+        this.#currentLevel = new Level(startingLevel);
         this.#camera = new Camera(this.#currentLevel);
     }
 
@@ -61,3 +61,5 @@ export default class InGame extends GameScreen {
         this.#camera = new Camera(this.#currentLevel);
     }
 }
+
+const startingLevel = 0;
