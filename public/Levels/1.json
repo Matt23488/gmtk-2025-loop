@@ -4,7 +4,7 @@
     "mobius": true,
     "nextLevel": 2,
     "goalType": "friend",
-    "startPosition": [9, 1],
+    "startPosition": [9.5, 1],
     "goalPosition": [4, 14],
     "tiles": [
         { "position": [7, 1], "height": 16 }

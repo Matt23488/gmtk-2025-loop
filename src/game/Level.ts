@@ -6,11 +6,15 @@ import { FlipFlop } from './Input';
 import type Input from './Input';
 import Player from './Player';
 import type Renderer from './Renderer';
+import StaticSprite from './StaticSprite';
 import TileSheet, { type TilePiece } from './TileSheet';
+
+const startSize = WorldSpaceCoordinate.from(1.75);
 
 export default class Level {
     #player: Player;
     #dirtTiles: TileSheet;
+    #start: StaticSprite;
     #goal: Goal;
     #background: Background;
     #debugFlipFlop: FlipFlop;
@@ -21,13 +25,13 @@ export default class Level {
     #height: WorldSpaceCoordinate;
     #mobius: boolean;
     #nextLevel: number | null;
-    #startPosition: Geometry.Point<WorldSpaceCoordinate>;
     #goalPosition: Geometry.Point<WorldSpaceCoordinate>;
     #tiles: Tile[];
 
     constructor(levelNumber: number) {
         this.#player = new Player();
         this.#dirtTiles = new TileSheet('Dirt');
+        this.#start = new StaticSprite('Start');
         this.#goal = new Goal();
         this.#background = new Background();
         this.#debugFlipFlop = new FlipFlop('debug');
@@ -38,7 +42,6 @@ export default class Level {
         this.#height = WorldSpaceCoordinate.from(9);
         this.#mobius = false;
         this.#nextLevel = null;
-        this.#startPosition = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(1)];
         this.#goalPosition = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(-1)];
         this.#tiles = [];
 
@@ -51,7 +54,6 @@ export default class Level {
                 this.#height = height;
                 this.#mobius = mobius;
                 this.#nextLevel = nextLevel ?? null;
-                this.#startPosition = startPosition;
                 this.#goalPosition = goalPosition;
 
                 for (const { position: [tileX, tileY], width, height } of tiles) {
@@ -74,6 +76,7 @@ export default class Level {
                 
                 this.#player.x = startPosition[0];
                 this.#player.y = startPosition[1];
+                this.#start.initialize(startPosition, [startSize, startSize], [width, height], mobius);
                 this.#goal.type = goalType;
             })
             .catch(() => this.#status = 'error');
@@ -109,8 +112,10 @@ export default class Level {
     }
 
     #wrap() {
-        if (this.#mobius)
+        if (this.#mobius) {
             this.#flipped = !this.#flipped;
+            this.#start.flip();
+        }
     }
 
     centerCameraAtPlayer(camera: Camera): void {
@@ -256,9 +261,9 @@ export default class Level {
     render(renderer: Renderer): void {
         this.#renderBackground(renderer);
         this.#renderLoopBoundary(renderer);
+        this.#start.render(renderer);
         this.#renderGround(renderer);
         this.#renderTiles(renderer);
-        this.#renderStart(renderer);
         this.#renderGoal(renderer);
         this.#renderPlayer(renderer);
     }
@@ -349,10 +354,6 @@ export default class Level {
                     WorldSpaceCoordinate.from(1),
                 ]
             );
-    }
-
-    #renderStart(_renderer: Renderer) {
-        // TODO
     }
 
     #renderGoal(renderer: Renderer) {

@@ -4,7 +4,7 @@
     "mobius": false,
     "nextLevel": 1,
     "goalType": "seed",
-    "startPosition": [9, 1],
+    "startPosition": [9.5, 1],
     "goalPosition": [4, 3],
     "tiles": [
         { "position": [7, 1], "height": 16 }

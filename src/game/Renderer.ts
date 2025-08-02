@@ -4,6 +4,7 @@ import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
 import type Goal from './Goal';
 import type Sprite from './Sprite';
+import type { StaticImage } from './StaticSprite';
 import type TileSheet from './TileSheet';
 import type { TilePiece } from './TileSheet';
 
@@ -146,6 +147,16 @@ export default class Renderer {
         this.#context.drawImage(
             tile.image,
             ...tile.getTilePieceBoundaries(piece),
+            x, y, w, h
+        );
+    }
+
+    renderImage(image: StaticImage, position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>) {
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions) as Geometry.Point;
+        const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
+
+        this.#context.drawImage(
+            ...image.renderParams,
             x, y, w, h
         );
     }
