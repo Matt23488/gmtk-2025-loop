@@ -43,22 +43,23 @@ export default class InGame extends GameScreen {
 
         if (this.#currentLevel.status === 'loaded') {
             this.#currentLevel.render(renderer);
-        } else
+        } else {
+            const text = this.#currentLevel.status === 'loading' ?
+                `Loading level ${this.#currentLevel.levelNumber}...` :
+                ':(';
+
             renderer.renderText(
-                this.#camera.center,
-                this.#currentLevel.status,
+                text,
                 '30px sans-serif',
                 'center',
                 'middle',
+                this.#camera.center,
                 {
-                    passes: [
-                        {
-                            type: 'fill',
-                            style: 'white',
-                        },
-                    ],
+                    type: 'fill',
+                    style: 'white',
                 }
             );
+        }
 
         renderer.renderFps(this.#fps);
     }

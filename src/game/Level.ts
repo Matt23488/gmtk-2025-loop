@@ -13,6 +13,7 @@ export default class Level {
     #goal: Goal;
     #background: Background;
 
+    #levelNumber: number;
     #status: Utils.LoadStatus;
     #width: WorldSpaceCoordinate;
     #height: WorldSpaceCoordinate;
@@ -28,6 +29,7 @@ export default class Level {
         this.#goal = new Goal();
         this.#background = new Background();
 
+        this.#levelNumber = levelNumber;
         this.#status = 'loading';
         this.#width = WorldSpaceCoordinate.from(16);
         this.#height = WorldSpaceCoordinate.from(9);
@@ -72,6 +74,10 @@ export default class Level {
                 this.#goal.type = goalType;
             })
             .catch(() => this.#status = 'error');
+    }
+
+    public get levelNumber(): number {
+        return this.#levelNumber;
     }
 
     public get status(): Utils.LoadStatus {

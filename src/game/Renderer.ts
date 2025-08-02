@@ -65,44 +65,54 @@ export default class Renderer {
         ];
     }
 
-    renderRect(...[worldPosition, worldWidth, worldHeight, options]: RenderPrimativeArgs<'rect'>) {
-        const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
-        const screenDimensions = this.camera.transformDimensions([worldWidth, worldHeight], this.screenDimensions);
+    renderRect(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>, ...passes: RenderPass[]) {
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
+        const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
 
-        this.#render(options, 'Rect', ...screenPosition, ...screenDimensions);
+        const callObj: RenderCallObj = {
+            fill: () => this.#context.fillRect(x, y, w, h),
+            stroke: () => this.#context.strokeRect(x, y, w, h),
+        };
+
+        this.#render(passes, callObj);
     }
 
-    renderText(...[worldPosition, text, font, textAlign, textBaseline, options]: RenderPrimativeArgs<'text'>) {
+    renderText(text: string, font: string, align: CanvasTextAlign, baseline: CanvasTextBaseline, position: Geometry.Point<WorldSpaceCoordinate>, ...passes: RenderPass[]) {//...[worldPosition, text, font, textAlign, textBaseline, options]: RenderPrimativeArgs<'text'>) {
         this.#context.font = font;
-        this.#context.textAlign = textAlign;
-        this.#context.textBaseline = textBaseline;
+        this.#context.textAlign = align;
+        this.#context.textBaseline = baseline;
 
-        const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
 
-        this.#render(options, 'Text', text, ...screenPosition);
+        const callObj: RenderCallObj = {
+            fill: () => this.#context.fillText(text, x, y),
+            stroke: () => this.#context.strokeText(text, x, y),
+        };
+
+        this.#render(passes, callObj);
     }
 
-    renderCircle(worldPosition: Geometry.Point<WorldSpaceCoordinate>, radius: WorldSpaceCoordinate, options: RenderPrimativeOptions) {
+    renderCircle(position: Geometry.Point<WorldSpaceCoordinate>, radius: WorldSpaceCoordinate, ...passes: RenderPass[]) {
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
         const [screenRadius] = this.camera.transformDimensions([radius, WorldSpaceCoordinate.from(0)], this.screenDimensions);
-        const screenPosition = this.camera.transformPoint(worldPosition, this.screenDimensions);
 
-        for (const pass of options.passes) {
+        const beginCircle = () => {
             this.#context.beginPath();
-            this.#context.arc(...screenPosition, screenRadius, 0, Math.PI * 2);
-            switch (pass.type) {
-                case 'fill':
-                    this.#context.fillStyle = pass.style;
-                    this.#context.fill();
-                    break;
-                case 'stroke':
-                    this.#context.strokeStyle = pass.style;
-                    this.#context.lineWidth = pass.width;
-                    this.#context.stroke();
-                    break;
-                default:
-                    throw new TypeExhaustionError('RenderPass', pass);
-            }
+            this.#context.arc(x, y, screenRadius, 0, Math.PI * 2);
         }
+
+        const callObj: RenderCallObj = {
+            fill: () => {
+                beginCircle();
+                this.#context.fill();
+            },
+            stroke: () => {
+                beginCircle();
+                this.#context.stroke();
+            },
+        };
+
+        this.#render(passes, callObj);
     }
 
     renderSprite(sprite: Sprite, position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>) {
@@ -158,35 +168,26 @@ export default class Renderer {
         this.#context.fillText(`fps: ${fps.toFixed(1)}`, 20, 20);
     }
 
-    #renderPass<Primative extends RenderPrimative>(pass: RenderPass, call: Capitalize<Primative>): Utils.AnyFunction {
+    #renderPass(pass: RenderPass, callObj: RenderCallObj) {
         switch (pass.type) {
             case 'fill':
                 this.#context.fillStyle = pass.style;
-                return this.#context[`fill${call}`].bind(this.#context);
+                break;
             case 'stroke':
                 this.#context.strokeStyle = pass.style;
                 this.#context.lineWidth = pass.width;
-                return this.#context[`stroke${call}`].bind(this.#context);
+                break;
             default:
                 throw new TypeExhaustionError('RenderPass', pass);
         }
+
+        callObj[pass.type]();
     }
 
-    #render<Primative extends RenderPrimative>(options: RenderPrimativeOptions, call: Capitalize<Primative>, ...args: RenderCallArgs<Capitalize<Primative>>) {
-        for (const pass of options.passes)
-            this.#renderPass(pass, call)(...args);
+    #render(passes: RenderPass[], callObj: RenderCallObj) {
+        for (const pass of passes)
+            this.#renderPass(pass, callObj);
     }
-}
-
-export type RenderPrimative = keyof RenderPrimativeTypeMap;
-
-interface RenderPrimativeTypeMap {
-    rect: [width: WorldSpaceCoordinate, height: WorldSpaceCoordinate];
-    text: [text: string, font: string, textAlign: CanvasTextAlign, textBaseline: CanvasTextBaseline];
-}
-
-export interface RenderPrimativeOptions {
-    passes: RenderPass[];
 }
 
 export type RenderPassType = RenderPass['type'];
@@ -202,5 +203,4 @@ interface RenderPassTypeMap {
     };
 }
 
-type RenderCallArgs<Call extends Capitalize<RenderPrimative>> = Parameters<CanvasRenderingContext2D[`${RenderPassType}${Call}`]>;
-type RenderPrimativeArgs<Primative extends RenderPrimative> = [position: Geometry.Point<WorldSpaceCoordinate>, ...RenderPrimativeTypeMap[Primative], options: RenderPrimativeOptions];
+type RenderCallObj = Record<RenderPassType, () => void>;
