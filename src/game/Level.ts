@@ -1,19 +1,18 @@
+import Background from './Background';
 import type Camera from './Camera';
-import { WorldSpaceCoordinate } from './Camera';
+import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Goal, { type GoalType } from './Goal';
 import type Input from './Input';
 import Player from './Player';
-import type { RenderPass } from './Renderer';
 import type Renderer from './Renderer';
 import TileSheet, { type TilePiece } from './TileSheet';
-
-const debug = false;
 
 export default class Level {
     #player: Player;
     #dirtTiles: TileSheet;
     #goal: Goal;
     #pauseManager: PauseManager;
+    #background: Background;
 
     #status: Utils.LoadStatus;
     #width: WorldSpaceCoordinate;
@@ -29,6 +28,7 @@ export default class Level {
         this.#dirtTiles = new TileSheet('Dirt');
         this.#goal = new Goal();
         this.#pauseManager = new PauseManager();
+        this.#background = new Background();
 
         this.#status = 'loading';
         this.#width = WorldSpaceCoordinate.from(16);
@@ -198,6 +198,8 @@ export default class Level {
         this.#player.velocityY = WorldSpaceCoordinate.from(this.#player.velocityY - Level.g * deltaTime);
         this.#player.velocityX = WorldSpaceCoordinate.from(this.#player.velocityX * 0.1 * deltaTime);
 
+        this.#background.scroll(ScreenSpaceCoordinate.from(offsetX * -5));
+
         if (this.#player.onGround) {
             if (Math.abs(this.#player.velocityX) > 0.01)
                 this.#player.sprite.playAnimation(1);
@@ -248,30 +250,17 @@ export default class Level {
     }
 
     #renderBackground(renderer: Renderer): void {
-        const passes: RenderPass[] = [
-            {
-                type: 'fill',
-                style: 'rgba(51, 46, 41, 1)',
-            },
-        ];
-
-        if (debug)
-            passes.push({
-                type: 'stroke',
-                style: 'rgb(0, 255, 0)',
-                width: 3,
-            });
-
-        for (let i = -1; i <= 1; i++)
-            renderer.renderRect(
-                [
-                    WorldSpaceCoordinate.from(-1 + i * this.#width),
-                    WorldSpaceCoordinate.from(0),
-                ],
-                WorldSpaceCoordinate.from(this.#width + 2),
-                this.#height,
-                { passes }
-            );
+        renderer.renderBackground(
+            this.#background,
+            [
+                WorldSpaceCoordinate.from(-this.#width),
+                WorldSpaceCoordinate.from(0),
+            ],
+            [
+                WorldSpaceCoordinate.from(3 * this.#width),
+                this.height,
+            ]
+        );
     }
 
     #renderGround(renderer: Renderer): void {

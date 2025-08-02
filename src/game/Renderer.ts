@@ -1,4 +1,5 @@
 import { TypeExhaustionError } from '../utils/Errors';
+import type Background from './Background';
 import { ScreenSpaceCoordinate, WorldSpaceCoordinate } from './Camera';
 import Camera from './Camera';
 import type Goal from './Goal';
@@ -134,6 +135,19 @@ export default class Renderer {
             goal.image,
             x, y, w, h
         );
+    }
+
+    renderBackground(background: Background, position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>) {
+        const [x, y] = this.camera.transformPoint(position, this.screenDimensions);
+        const [w, h] = this.camera.transformDimensions(size, this.screenDimensions);
+
+        this.#context.save();
+
+        this.#context.translate(background.parallaxOffset, 0);
+        this.#context.fillStyle = this.#context.createPattern(background.image, 'repeat')!;
+        this.#context.fillRect(x, y, w, h);
+
+        this.#context.restore();
     }
 
     renderFps(fps: number) {
