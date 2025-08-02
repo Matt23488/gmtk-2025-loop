@@ -1,53 +1,106 @@
 export default class Input {
-    #left = false;
-    #right = false;
-    #jumpPressed = false;
-    #pausePressed = false;
-
     constructor() {
         document.addEventListener('keydown', this.#getEventListener(true));
         document.addEventListener('keyup', this.#getEventListener(false));
     }
 
-    get leftPressed(): boolean {
+    get left(): KeyState {
         return this.#left;
     }
 
-    get rightPressed(): boolean {
+    get right(): KeyState {
         return this.#right;
     }
 
-    get jumpPressed(): boolean {
-        return this.#jumpPressed;
+    get jump(): KeyState {
+        return this.#jump;
     }
 
-    get pausePressed(): boolean {
-        return this.#pausePressed;
+    get pause(): KeyState {
+        return this.#pause;
     }
+
+    get debug(): KeyState {
+        return this.#debug;
+    }
+
+    update() {
+        this.#updateKeyState(this.#left);
+        this.#updateKeyState(this.#right);
+        this.#updateKeyState(this.#jump);
+        this.#updateKeyState(this.#pause);
+        this.#updateKeyState(this.#debug);
+    }
+    
+    readonly #left = getDefaultKeyState();
+    readonly #right = getDefaultKeyState();
+    readonly #jump = getDefaultKeyState();
+    readonly #pause = getDefaultKeyState();
+    readonly #debug = getDefaultKeyState();
 
     #getEventListener(value: boolean): (e: KeyboardEvent) => void {
         return e => {
-            if (e.repeat && value) return;
+            let action: MutableKeyState | null = null;
 
             switch (e.key) {
                 case 'a':
                 case 'ArrowLeft':
-                    this.#left = value;
+                    action = this.#left;
                     break;
 
                 case 'd': 
                 case 'ArrowRight':
-                    this.#right = value;
+                    action = this.#right;
                     break;
 
                 case ' ':
-                    this.#jumpPressed = value;
+                    action = this.#jump;
                     break;
 
                 case 'Escape':
-                    this.#pausePressed = value;
+                    action = this.#pause;
+                    break;
+
+                case 'q':
+                    action = this.#debug;
                     break;
             }
+
+            if (action)
+                action.shouldPress = value;
         };
     }
+
+    #updateKeyState(state: MutableKeyState) {
+        if (state.pressed)
+            state.repeat = true;
+
+        if (state.shouldPress)
+            state.pressed = true;
+        else {
+            state.pressed = false;
+            state.repeat = false;
+        }
+        // if (state.pressed)
+        //     state.repeat = true;
+    }
+}
+
+function getDefaultKeyState(): MutableKeyState {
+    return {
+        pressed: false,
+        repeat: false,
+        shouldPress: false,
+    };
+}
+
+type MutableKeyState = {
+    -readonly [Key in keyof KeyState]: KeyState[Key];
+} & {
+    shouldPress: boolean;
+};
+
+export interface KeyState {
+    readonly pressed: boolean;
+    readonly repeat: boolean;
 }

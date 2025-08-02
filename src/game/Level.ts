@@ -11,7 +11,6 @@ export default class Level {
     #player: Player;
     #dirtTiles: TileSheet;
     #goal: Goal;
-    #pauseManager: PauseManager;
     #background: Background;
 
     #status: Utils.LoadStatus;
@@ -27,7 +26,6 @@ export default class Level {
         this.#player = new Player();
         this.#dirtTiles = new TileSheet('Dirt');
         this.#goal = new Goal();
-        this.#pauseManager = new PauseManager();
         this.#background = new Background();
 
         this.#status = 'loading';
@@ -230,9 +228,6 @@ export default class Level {
 
     static readonly g = 100;
     update(deltaTime: number, input: Input): void {
-        this.#pauseManager.processInput(input);
-        if (this.#pauseManager.paused)
-            return;
 
         this.#player.processInput(input);
         this.#updatePlayer(deltaTime);
@@ -337,39 +332,6 @@ export default class Level {
 
     #shouldFlipY(copy: boolean) {
         return (this.#flipped && !copy) || (!this.#flipped && copy && this.#mobius);
-    }
-}
-
-class PauseManager {
-    get paused(): boolean {
-        return this.#paused;
-    }
-
-    processInput(input: Input) {
-        this.#processPauseInput(input.pausePressed);
-    }
-    
-    #paused = false;
-    #pauseBtnPressed = false;
-    #modal: HTMLDivElement | null = null;
-
-    #processPauseInput(pressed: boolean) {
-        if (pressed && !this.#pauseBtnPressed) {
-            this.#paused = !this.#paused;
-
-            if (this.#paused) {
-                this.#modal = document.createElement('div');
-                this.#modal.classList.add('pause');
-                this.#modal.textContent = 'Paused';
-
-                document.body.appendChild(this.#modal);
-            } else {
-                this.#modal!.remove();
-                this.#modal = null;
-            }
-        }
-
-        this.#pauseBtnPressed = pressed;
     }
 }
 

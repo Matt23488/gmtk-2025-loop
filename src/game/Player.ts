@@ -92,13 +92,13 @@ export default class Player {
     }
 
     processInput(input: Input) {
-        if (input.leftPressed)
+        if (input.left.pressed)
             this.#moveLeft();
 
-        if (input.rightPressed)
+        if (input.right.pressed)
             this.#moveRight();
 
-        if (input.jumpPressed)
+        if (input.jump.pressed && !input.jump.repeat)
             this.#jump();
     }
 }

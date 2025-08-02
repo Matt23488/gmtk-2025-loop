@@ -26,6 +26,7 @@ export default class Game {
         const deltaTime = (totalTime - this.#lastFrameTime) / 1000;
         this.#lastFrameTime = totalTime;
 
+        this.#input.update();
         this.#screen.update(deltaTime, this.#input);
 
         this.#renderer.beginFrame();
