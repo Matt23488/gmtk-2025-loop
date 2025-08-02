@@ -121,7 +121,7 @@ export default class Renderer {
         this.#context.drawImage(
             tile.image,
             ...tile.getTilePieceBoundaries(piece),
-            x, y < 0 ? -y : y, w, h
+            x, y, w, h
         );
     }
 
