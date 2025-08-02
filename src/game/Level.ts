@@ -352,9 +352,6 @@ export default class Level {
 }
 
 class PauseManager {
-    #paused = false;
-    #pauseBtnPressed = false;
-
     get paused(): boolean {
         return this.#paused;
     }
@@ -362,10 +359,26 @@ class PauseManager {
     processInput(input: Input) {
         this.#processPauseInput(input.pausePressed);
     }
+    
+    #paused = false;
+    #pauseBtnPressed = false;
+    #modal: HTMLDivElement | null = null;
 
     #processPauseInput(pressed: boolean) {
-        if (pressed && !this.#pauseBtnPressed)
+        if (pressed && !this.#pauseBtnPressed) {
             this.#paused = !this.#paused;
+
+            if (this.#paused) {
+                this.#modal = document.createElement('div');
+                this.#modal.classList.add('pause');
+                this.#modal.textContent = 'Paused';
+
+                document.body.appendChild(this.#modal);
+            } else {
+                this.#modal!.remove();
+                this.#modal = null;
+            }
+        }
 
         this.#pauseBtnPressed = pressed;
     }
