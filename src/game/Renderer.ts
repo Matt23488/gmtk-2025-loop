@@ -91,7 +91,7 @@ export default class Renderer {
         this.#render(passes, callObj);
     }
 
-    renderText(text: string, font: string, align: CanvasTextAlign, baseline: CanvasTextBaseline, position: Geometry.Point<WorldSpaceCoordinate>, ...passes: RenderPass[]) {//...[worldPosition, text, font, textAlign, textBaseline, options]: RenderPrimativeArgs<'text'>) {
+    renderText(text: string, font: string, align: CanvasTextAlign, baseline: CanvasTextBaseline, position: Geometry.Point<WorldSpaceCoordinate>, ...passes: RenderPass[]) {
         this.#context.font = font;
         this.#context.textAlign = align;
         this.#context.textBaseline = baseline;
