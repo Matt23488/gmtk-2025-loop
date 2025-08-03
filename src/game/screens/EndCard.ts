@@ -1,5 +1,5 @@
 import HtmlScreen, { type HtmlTemplate } from '../HtmlScreen';
-import MainMenu from './MainMenu';
+import Credits from './Credits';
 
 const template = { get: '' };
 
@@ -17,14 +17,20 @@ export default class EndCard extends HtmlScreen {
 
         const abortController = new AbortController();
 
+        const showCredits = () => {
+            abortController.abort();
+            this.transitionTo(new Credits(this.container));
+        };
+
         document.addEventListener('keyup', e => {
             switch (e.key) {
                 case 'Escape':
                 case 'Enter':
-                    abortController.abort();
-                    this.transitionTo(new MainMenu(this.container));
+                    showCredits();
                     break;
             }            
         }, { signal: abortController.signal });
+
+        setTimeout(showCredits, 5000);
     }
 }

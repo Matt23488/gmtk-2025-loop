@@ -27,11 +27,13 @@ body {
 }
 
 .btn {
+  font-size: 2em;
   background-color: transparent;
   padding: 0.5em 1em;
   border: 3px solid currentColor;
   border-radius: 5px;
   cursor: pointer;
+  margin: 2em;
 }
 
 .btn:focus {
@@ -43,11 +45,14 @@ body {
   inset: 0;
   color: white;
   background-color: rgba(0, 0, 0, 0.7);
-  display: grid;
-  place-items: center;
-  font-size: 5rem;
+  text-align: center;
+  font-size: 2rem;
 }
 
 .end-card {
   height: 100%;
+}
+
+.credits {
+  font-size: 3em;
 }
