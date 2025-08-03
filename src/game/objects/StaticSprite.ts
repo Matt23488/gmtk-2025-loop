@@ -35,6 +35,10 @@ export default class StaticSprite {
         this.#copyB.flipVertical = copyFlipState;
     }
 
+    get isFlipped(): boolean {
+        return this.#real.flipVertical;
+    }
+
     initialize(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>, levelSize: Geometry.Point<WorldSpaceCoordinate>, mobius: boolean) {
         this.#position = position;
         this.#size = size;
@@ -70,7 +74,7 @@ export default class StaticSprite {
     }
 
     #flipY(y: WorldSpaceCoordinate): WorldSpaceCoordinate {
-        if (this.#mobius) {
+        if (this.#mobius || this.isFlipped) {
             const offsetY = 1 - this.#size[1];
             return WorldSpaceCoordinate.from(this.#levelSize[1] + offsetY - y - 1);
         }
@@ -118,6 +122,7 @@ function getSprite(name: string) {
         case 'UpArrow': return upArrowImg;
         case 'DownArrow': return downArrowImg;
         case 'Rock': return rockImg;
+        case 'Mice': return miceImg;
         default: return getImage(`${import.meta.env.BASE_URL}Sprites/${name}.png`);
     }
 }
@@ -126,8 +131,10 @@ import Start from '/Sprites/Start.png';
 import UpArrow from '/Sprites/UpArrow.png';
 import DownArrow from '/Sprites/DownArrow.png';
 import Rock from '/Sprites/Rock.png';
+import Mice from '/Sprites/Mice.png';
 
 const startImg = getImage(Start);
 const upArrowImg = getImage(UpArrow);
 const downArrowImg = getImage(DownArrow);
 const rockImg = getImage(Rock);
+const miceImg = getImage(Mice);

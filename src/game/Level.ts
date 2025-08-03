@@ -494,7 +494,7 @@ export default class Level {
     }
 
     #shouldFlipY(copy: boolean) {
-        return (this.#flipped && !copy) || (!this.#flipped && copy && this.#mobius);
+        return (this.#flipped && !copy) || (!this.#flipped && copy && this.#mobius) || (this.#flipped && !this.#mobius);
     }
 }
 

@@ -4,9 +4,12 @@ import type Renderer from '../Renderer';
 import type StaticSprite from './StaticSprite';
 
 export default abstract class Trigger {
-    constructor(sprite: StaticSprite) {
+    constructor(sprite: StaticSprite, flipped: boolean) {
         this.#sprite = sprite;
         this.#activated = false;
+
+        if (flipped)
+            this.flip();
     }
 
     get position(): Geometry.Point<WorldSpaceCoordinate> {
@@ -26,7 +29,7 @@ export default abstract class Trigger {
     }
 
     isActivated(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>): boolean {
-        if (this.#activated)
+        if (this.#activated || this.#sprite.isFlipped)
             return false;
 
         return this.#isOverlapping2D(
@@ -61,6 +64,6 @@ export default abstract class Trigger {
     }
 }
 
-export type TriggerJson = [name: string, x: WorldSpaceCoordinate, y: WorldSpaceCoordinate, w: WorldSpaceCoordinate, h: WorldSpaceCoordinate];
+export type TriggerJson = [name: string, x: WorldSpaceCoordinate, y: WorldSpaceCoordinate, w: WorldSpaceCoordinate, h: WorldSpaceCoordinate, flipped?: true];
 
 type Box = [Geometry.Point, Geometry.Point];

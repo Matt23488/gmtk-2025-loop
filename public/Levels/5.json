@@ -1,0 +1,32 @@
+{
+    "width": 24,
+    "height": 27,
+    "mobius": true,
+    "goalType": "huge-arrow",
+    "startPosition": [3.5, 1],
+    "goalPosition": [9, 8],
+    "tiles": [
+        { "position": [20, 6], "width": 4 },
+        { "position": [2, 4], "width": 4 },
+        { "position": [20, 12], "width": 4 },
+        { "position": [2, 10], "width": 4 },
+        { "position": [20, 18], "width": 4 },
+        { "position": [2, 16], "width": 4 },
+        { "position": [20, 24], "width": 4 },
+        { "position": [2, 22], "width": 4 },
+        { "position": [0, 24], "width": 6 },
+        { "position": [18, 6], "height": 20 },
+        { "position": [6, 1], "height": 25 },
+        { "position": [8, 1], "width": 5, "height": 6 },
+        { "position": [21, 1], "width": 3 },
+        { "position": [8, 10], "width": 10 }
+    ],
+    "staticSprites": [
+        ["Mice", 15, 12, 5, 5]
+    ],
+    "triggers": [
+        ["mobius-toggle", 2.5, 18, 2, 2],
+        ["mobius-toggle", 14.5, 1, 2, 2],
+        ["mobius-toggle", 3.5, 23, 2, 2, true]
+    ]
+}

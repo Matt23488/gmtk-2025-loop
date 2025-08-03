@@ -4,11 +4,11 @@ import StaticSprite from '../StaticSprite';
 import Trigger from '../Trigger';
 
 export default class MobiusToggleTrigger extends Trigger {
-    constructor(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>, levelSize: Geometry.Point<WorldSpaceCoordinate>, mobius: boolean) {
+    constructor(position: Geometry.Point<WorldSpaceCoordinate>, size: Geometry.Point<WorldSpaceCoordinate>, levelSize: Geometry.Point<WorldSpaceCoordinate>, mobius: boolean, flipped: boolean) {
         const sprite = new StaticSprite('Rock');
         sprite.initialize(position, size, levelSize, mobius);
 
-        super(sprite);
+        super(sprite, flipped);
     }
 
     activate(level: Level): void {

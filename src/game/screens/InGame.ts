@@ -59,7 +59,7 @@ export default class InGame extends GameScreen {
 
             renderer.renderText(
                 text,
-                '30px sans-serif',
+                `${(this.container.clientHeight / 10).toFixed(0)}px sans-serif`,
                 'center',
                 'middle',
                 this.#camera.center,
