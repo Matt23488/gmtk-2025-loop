@@ -89,7 +89,7 @@ class PauseManager {
         this.#pauseFlipFlop.onSet = () => {
             this.#modal = document.createElement('div');
             this.#modal.classList.add('pause');
-            this.#modal.innerHTML = '<h1>Paused</h1><div>A/D/Left/Right - Move Player</div><div>R - Restart Level</div><div>Q - Display FPS</div>';
+            this.#modal.innerHTML = '<h1>Paused</h1><div>A/D/Left/Right - Move</div><div>Space - Jump</div><div>R - Restart Level</div><div>Q - Display FPS</div>';
 
             document.body.appendChild(this.#modal);
         };
