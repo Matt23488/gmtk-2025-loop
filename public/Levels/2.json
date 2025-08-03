@@ -3,7 +3,7 @@
     "height": 18,
     "mobius": true,
     "nextLevel": 3,
-    "goalType": "friend",
+    "goalType": "sea-artifact",
     "startPosition": [9.5, 1],
     "goalPosition": [4, 3],
     "tiles": [
