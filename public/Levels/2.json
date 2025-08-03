@@ -1,16 +1,16 @@
 {
     "width": 44,
     "height": 18,
-    "mobius": true,
+    "mobius": false,
     "nextLevel": 3,
-    "goalType": "sea-artifact",
+    "goalType": "friend",
     "startPosition": [9.5, 1],
-    "goalPosition": [4, 3],
+    "goalPosition": [4, 14],
     "tiles": [
         { "position": [7, 1], "height": 16 }
     ],
     "staticSprites": [
-        ["DownArrow", 4, 6, 2, 2]
+        ["UpArrow", 4, 11, 2, 2]
     ],
     "triggers": [
         ["mobius-toggle", 42, 1, 2, 2]

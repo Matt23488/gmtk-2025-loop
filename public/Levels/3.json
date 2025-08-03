@@ -1,18 +1,18 @@
 {
-    "width": 24,
+    "width": 44,
     "height": 18,
     "mobius": true,
     "nextLevel": 4,
-    "goalType": "strangers-wing",
-    "startPosition": [3, 1],
-    "goalPosition": [11, 2],
+    "goalType": "sea-artifact",
+    "startPosition": [9.5, 1],
+    "goalPosition": [4, 3],
     "tiles": [
-        { "position": [5, 1], "width": 4 },
-        { "position": [7, 3] },
-        { "position": [9, 5], "width": 15 },
-        { "position": [0, 11], "width": 17 },
-        { "position": [22, 7], "height": 10 },
-        { "position": [0, 1], "height": 10 },
-        { "position": [19, 7], "width": 3, "height": 3 }
+        { "position": [7, 1], "height": 16 }
+    ],
+    "staticSprites": [
+        ["DownArrow", 4, 6, 2, 2]
+    ],
+    "triggers": [
+        ["mobius-toggle", 42, 1, 2, 2]
     ]
 }
