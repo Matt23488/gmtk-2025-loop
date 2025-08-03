@@ -4,7 +4,7 @@ import { FlipFlop } from '../Input';
 import type Input from '../Input';
 import Level from '../Level';
 import type Renderer from '../Renderer';
-import MainMenu from './MainMenu';
+import EndCard from './EndCard';
 
 const startingLevel = 0;
 
@@ -43,7 +43,7 @@ export default class InGame extends GameScreen {
             if (this.#currentLevel.nextLevel !== null)
                 this.#transitionLevel(this.#currentLevel.nextLevel);
             else
-                this.transitionTo(new MainMenu(this.container))
+                this.transitionTo(new EndCard(this.container))
         }
     }
 

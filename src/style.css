@@ -47,3 +47,7 @@ body {
   place-items: center;
   font-size: 5rem;
 }
+
+.end-card {
+  height: 100%;
+}
