@@ -6,7 +6,7 @@ import Level from '../Level';
 import type Renderer from '../Renderer';
 import EndCard from './EndCard';
 
-const startingLevel = 0;
+const startingLevel = 9;
 
 export default class InGame extends GameScreen {
     #currentLevel: Level;

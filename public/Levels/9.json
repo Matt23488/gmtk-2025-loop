@@ -2,7 +2,7 @@
     "width": 24,
     "height": 16,
     "mobius": false,
-    "goalType": "friend",
+    "goalType": "sea-artifact",
     "startPosition": [20.5, 1],
     "goalPosition": [2.5, 13.5],
     "tiles": [
@@ -11,9 +11,9 @@
         { "position": [4, 13], "height": 2, "width": 1 },
         { "position": [0, 12], "width": 8, "height": 1 },
         { "position": [3, 1], "width": 1, "height": 8 },
-        { "position": [18, 9], "width": 1, "height": 8 },
-        { "position": [13, 6], "width": 4, "height": 1 },
-        { "position": [7, 9], "width": 4, "height": 1 },
+        { "position": [20, 8], "width": 1, "height": 8 },
+        { "position": [9, 6], "width": 8, "height": 1 },
+        { "position": [7, 9], "width": 8, "height": 1 },
         { "position": [16, 4], "width": 1, "height": 2 },
         { "position": [7, 10], "width": 1, "height": 2 }
     ],
