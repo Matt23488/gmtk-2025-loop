@@ -2,6 +2,7 @@
     "width": 24,
     "height": 16,
     "mobius": false,
+    "nextLevel": 10,
     "goalType": "sea-artifact",
     "startPosition": [20.5, 1],
     "goalPosition": [2.5, 13.5],
