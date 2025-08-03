@@ -31,6 +31,9 @@ export default class InGame extends GameScreen {
         if (this.#pauseManager.paused)
             return;
 
+        if (input.restart.pressed && !input.restart.repeat)
+            this.#transitionLevel(this.#currentLevel.levelNumber);
+
         this.#debugFlipFlop.processInput(input);
 
         this.#currentLevel.update(deltaTime, input);

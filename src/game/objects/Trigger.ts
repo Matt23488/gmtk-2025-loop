@@ -17,6 +17,10 @@ export default abstract class Trigger {
         return this.#sprite.size;
     }
 
+    set mobius(mobius: boolean) {
+        this.#sprite.mobius = mobius;
+    }
+
     activate(_level: Level): void {
         this.#activated = true;
     }

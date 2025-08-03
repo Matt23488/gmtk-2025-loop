@@ -11,6 +11,7 @@ import TileSheet, { type TilePiece } from './TileSheet';
 import Trigger from './objects/Trigger';
 import * as TriggerFactory from './objects/TriggerFactory';
 import type { TriggerJson } from './objects/Trigger';
+import { filterMap } from '../utils';
 
 const startSize = WorldSpaceCoordinate.from(1.75);
 
@@ -24,7 +25,6 @@ export default class Level {
 
     #levelNumber: number;
     #status: Utils.LoadStatus;
-    #levelJson: LevelJson | null;
     #width: WorldSpaceCoordinate;
     #height: WorldSpaceCoordinate;
     #mobius: boolean;
@@ -44,7 +44,6 @@ export default class Level {
 
         this.#levelNumber = levelNumber;
         this.#status = 'loading';
-        this.#levelJson = null;
         this.#width = WorldSpaceCoordinate.from(16);
         this.#height = WorldSpaceCoordinate.from(9);
         this.#mobius = false;
@@ -54,8 +53,7 @@ export default class Level {
         this.#staticSprites = [];
         this.#triggers = [];
 
-        const url = `${import.meta.env.BASE_URL}Levels/${levelNumber}.json`;
-        fetch(url)
+        fetch(`${import.meta.env.BASE_URL}Levels/${levelNumber}.json`)
             .then(r => r.json())
             .then(this.#initialize.bind(this))
             .catch(() => this.#status = 'error');
@@ -94,6 +92,7 @@ export default class Level {
         this.#mobius = !this.#mobius;
         this.#start.mobius = this.#mobius;
         this.#staticSprites.forEach(sprite => sprite.mobius = this.#mobius);
+        this.#triggers.forEach(trigger => trigger.mobius = this.#mobius);
     }
 
     #wrap() {
@@ -101,6 +100,7 @@ export default class Level {
             this.#flipped = !this.#flipped;
             this.#start.flip();
             this.#staticSprites.forEach(sprite => sprite.flip());
+            this.#triggers.forEach(trigger => trigger.flip());
         }
     }
 
@@ -108,9 +108,7 @@ export default class Level {
         camera.centerAt(this.#player.position[0]);
     }
 
-    #initialize(levelJson: LevelJson) {
-        this.#levelJson = levelJson;
-        const { width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites, triggers } = levelJson;
+    #initialize({ width, height, mobius, nextLevel, goalType, startPosition, goalPosition, tiles, staticSprites, triggers }: LevelJson) {
 
         this.#status = 'loaded';
         this.#width = width;
@@ -118,6 +116,7 @@ export default class Level {
         this.#mobius = mobius;
         this.#nextLevel = nextLevel ?? null;
         this.#goalPosition = goalPosition;
+        this.#flipped = false;
 
         this.#tiles = [];
         for (const { position: [tileX, tileY], width, height } of tiles) {
@@ -169,12 +168,29 @@ export default class Level {
         let newY = playerY + offsetY;
 
         if (offsetX < 0) {
-            let tiles = this.#tiles.map(([x, y]) => [x, y]);
+            let tiles = this.#tiles.map(([x, y]) => [x, y] as Geometry.Point);
             if (this.flipped)
                 tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
-            const collidingTile = tiles
-                .filter(([tileX, tileY]) => tileX + 1 <= playerX && tileX + 1 > newX && playerY < tileY + 1 && playerY + playerHeight >= tileY)
+            const checkTile = ([tileX, tileY]: Geometry.Point, [playerX, playerY]: Geometry.Point, newX: number) => {
+                return tileX + 1 <= playerX && tileX + 1 > newX && playerY < tileY + 1 && playerY + playerHeight >= tileY;
+            };
+
+            const filterFn = ([tileX, tileY]: Geometry.Point): Geometry.Point | null => {
+                if (checkTile([tileX, tileY], [playerX, playerY], newX))
+                    return [tileX, tileY];
+
+                const copyY = this.#mobius ? this.#height - tileY - 1 : tileY;
+                if (checkTile([tileX, copyY], [playerX - this.#width, playerY], newX - this.#width))
+                    return [tileX + this.#width, tileY];
+
+                if (checkTile([tileX, copyY], [playerX + this.#width, playerY], newX + this.#width))
+                    return [tileX - this.#width, tileY];
+
+                return null;
+            };
+
+            const collidingTile = filterMap(tiles, filterFn)
                 .sort(([ax], [bx]) => bx - ax)[0];
 
             if (collidingTile) {
@@ -183,12 +199,29 @@ export default class Level {
             }
             
         } else if (offsetX > 0) {
-            let tiles = this.#tiles.map(([x, y]) => [x, y]);
+            let tiles = this.#tiles.map(([x, y]) => [x, y] as Geometry.Point);
             if (this.flipped)
                 tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
-            const collidingTile = tiles
-                .filter(([tileX, tileY]) => playerX + playerWidth <= tileX && newX + playerWidth > tileX && playerY < tileY + 1 && playerY + playerHeight >= tileY)
+            const checkTile = ([tileX, tileY]: Geometry.Point, [playerX, playerY]: Geometry.Point, newX: number) =>  {
+                return playerX + playerWidth <= tileX && newX + playerWidth > tileX && playerY < tileY + 1 && playerY + playerHeight >= tileY;
+            };
+
+            const filterFn = ([tileX, tileY]: Geometry.Point): Geometry.Point | null => {
+                if (checkTile([tileX, tileY], [playerX, playerY], newX))
+                    return [tileX, tileY];
+
+                const copyY = this.#mobius ? this.#height - tileY - 1 : tileY;
+                if (checkTile([tileX, copyY], [playerX - this.#width, playerY], newX - this.#width))
+                    return [tileX + this.#width, tileY];
+
+                if (checkTile([tileX, copyY], [playerX + this.#width, playerY], newX + this.#width))
+                    return [tileX - this.#width, tileY];
+
+                return null;
+            };
+
+            const collidingTile = filterMap(tiles, filterFn)
                 .sort(([ax], [bx]) => ax - bx)[0];
 
             if (collidingTile) {
@@ -207,12 +240,29 @@ export default class Level {
             this.#player.velocityY = WorldSpaceCoordinate.from(0);
 
         } else if (offsetY < 0) {
-            let tiles = this.#tiles.map(([x, y]) => [x, y]);
+            let tiles = this.#tiles.map(([x, y]) => [x, y] as Geometry.Point);
             if (this.flipped)
                 tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
-            const collidingTile = tiles
-                .filter(([tileX, tileY]) => tileY + 1 <= playerY && tileY + 1 > newY && playerX < tileX + 1 && playerX + playerWidth >= tileX)
+            const checkTile = ([tileX, tileY]: Geometry.Point, [playerX, playerY]: Geometry.Point) => {
+                return tileY + 1 <= playerY && tileY + 1 > newY && playerX < tileX + 1 && playerX + playerWidth >= tileX;
+            }
+
+            const filterFn = ([tileX, tileY]: Geometry.Point): Geometry.Point | null => {
+                if (checkTile([tileX, tileY], [playerX, playerY]))
+                    return [tileX, tileY];
+
+                const copyY = this.#mobius ? this.#height - tileY - 1 : tileY;
+                if (checkTile([tileX, copyY], [playerX - this.#width, playerY]))
+                    return [tileX + this.#width, copyY];
+
+                if (checkTile([tileX, copyY], [playerX + this.#width, playerY]))
+                    return [tileX - this.#width, copyY];
+
+                return null;
+            };
+
+            const collidingTile = filterMap(tiles, filterFn)
                 .sort(([,ay], [,by]) => by - ay)[0];
 
             if (collidingTile) {
@@ -224,12 +274,29 @@ export default class Level {
             }
 
         } else if (offsetY > 0) {
-            let tiles = this.#tiles.map(([x, y]) => [x, y]);
+            let tiles = this.#tiles.map(([x, y]) => [x, y] as Geometry.Point);
             if (this.flipped)
                 tiles = tiles.map(([x, y]) => [x, WorldSpaceCoordinate.from(this.#height - y - 1)]);
 
-            const collidingTile = tiles
-                .filter(([tileX, tileY]) => playerY + playerHeight <= tileY && newY + playerHeight > tileY && playerX < tileX + 1 && playerX + playerWidth >= tileX)
+            const checkTile = ([tileX, tileY]: Geometry.Point, [playerX, playerY]: Geometry.Point) => {
+                return playerY + playerHeight <= tileY && newY + playerHeight > tileY && playerX < tileX + 1 && playerX + playerWidth >= tileX;
+            }
+
+            const filterFn = ([tileX, tileY]: Geometry.Point): Geometry.Point | null => {
+                if (checkTile([tileX, tileY], [playerX, playerY]))
+                    return [tileX, tileY];
+
+                const copyY = this.#mobius ? this.#height - tileY - 1 : tileY;
+                if (checkTile([tileX, copyY], [playerX - this.#width, playerY]))
+                    return [tileX + this.#width, copyY];
+
+                if (checkTile([tileX, copyY], [playerX + this.#width, playerY]))
+                    return [tileX - this.#width, copyY];
+
+                return null;
+            };
+
+            const collidingTile = filterMap(tiles, filterFn)
                 .sort(([,ay], [,by]) => ay - by)[0];
 
             if (collidingTile) {
@@ -298,9 +365,6 @@ export default class Level {
     }
 
     #processInput(input: Input) {
-        if (input.restart.pressed && !input.restart.repeat && this.#levelJson)
-            this.#initialize(this.#levelJson);
-
         this.#debugFlipFlop.processInput(input);
         this.#player.processInput(input);
     }
@@ -321,11 +385,11 @@ export default class Level {
         renderer.renderBackground(
             this.#background,
             [
-                WorldSpaceCoordinate.from(-this.#width),
+                WorldSpaceCoordinate.from(-3 * this.#width),
                 WorldSpaceCoordinate.from(0),
             ],
             [
-                WorldSpaceCoordinate.from(3 * this.#width),
+                WorldSpaceCoordinate.from(7 * this.#width),
                 this.height,
             ]
         );

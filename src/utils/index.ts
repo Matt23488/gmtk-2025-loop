@@ -5,3 +5,9 @@ export function getImage(url: string, onload = () => {}): HTMLImageElement {
 
     return img;
 }
+
+export function filterMap<T>(items: T[], filterFn: (item: T) => T | null): T[] {
+    return items
+        .map(filterFn)
+        .filter(item => item !== null);
+}
