@@ -10,7 +10,7 @@ export default class Player {
 
     constructor() {
         this.#sprite = new Sprite('Cass');
-        this.#size = [WorldSpaceCoordinate.from(1), WorldSpaceCoordinate.from(1)];
+        this.#size = [WorldSpaceCoordinate.from(0.9), WorldSpaceCoordinate.from(0.9)];
         this.#position = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(0)];
         this.#velocity = [WorldSpaceCoordinate.from(0), WorldSpaceCoordinate.from(0)];
     }
