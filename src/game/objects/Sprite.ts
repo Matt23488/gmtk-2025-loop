@@ -52,14 +52,16 @@ export default class Sprite {
     }
 
     animate(deltaTime: number) {
-        if (this.#status !== 'loaded')
+        if (this.#status !== 'loaded' || this.#animation.numFrames === 1)
             return;
         
+        const duration = this.#animation.duration ?? 1;
+        
         let animationDeltaTime = this.#animationDeltaTime + deltaTime;
-        if (animationDeltaTime > this.#animation.duration)
+        if (animationDeltaTime > duration)
             animationDeltaTime = 0;
 
-        this.#animationFrame = Math.floor(animationDeltaTime / this.#animation.duration * this.#animation.numFrames);
+        this.#animationFrame = Math.floor(animationDeltaTime / duration * this.#animation.numFrames);
         this.#animationDeltaTime = animationDeltaTime;
     }
 
@@ -83,5 +85,5 @@ interface SpriteJson {
 
 interface AnimationJson {
     numFrames: number;
-    duration: number;
+    duration?: number;
 }
