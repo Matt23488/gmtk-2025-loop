@@ -2,6 +2,7 @@
     "width": 28,
     "height": 19,
     "mobius": false,
+    "nextLevel": 9,
     "goalType": "friend",
     "startPosition": [1.5, 1],
     "goalPosition": [26.5, 13.5],
