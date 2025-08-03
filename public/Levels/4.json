@@ -2,6 +2,7 @@
     "width": 48,
     "height": 27,
     "mobius": false,
+    "nextLevel": 5,
     "goalType": "giants-eye",
     "startPosition": [3.5, 1],
     "goalPosition": [13, 16],

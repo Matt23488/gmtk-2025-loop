@@ -18,6 +18,10 @@ body {
   overflow: hidden;
 }
 
+canvas {
+  cursor: none;
+}
+
 #app {
   width: 100dvw;
   height: 100dvh;
