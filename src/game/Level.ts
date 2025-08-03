@@ -124,7 +124,7 @@ export default class Level {
             const h = height ?? 2;
 
             for (let y = 0; y < h; y++) {
-                const pieceY = y === 0 ? 'bottom' : y === h - 1 ? 'top' : '';
+                const pieceY = y === h - 1 ? 'top' : y === 0 ? 'bottom' : '';
                 for (let x = 0; x < w; x++) {
                     const pieceX = x === 0 ? 'left' : x === w - 1 ? 'right' : '';
                     
