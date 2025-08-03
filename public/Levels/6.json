@@ -2,6 +2,7 @@
     "width": 24,
     "height": 27,
     "mobius": true,
+    "nextLevel": 7,
     "goalType": "seed",
     "startPosition": [3.5, 1],
     "goalPosition": [9, 8],
