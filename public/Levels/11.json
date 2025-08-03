@@ -1,0 +1,43 @@
+{
+    "width": 34,
+    "height": 32,
+    "mobius": false,
+    "goalType": "giants-eye",
+    "startPosition": [2, 1],
+    "goalPosition": [1, 13.5],
+    "tiles": [
+        { "position": [0, 1], "width": 1, "height": 4 },
+        { "position": [0, 15], "width": 34 },
+        { "position": [0, 5], "width": 4, "height": 1 },
+        { "position": [0, 10], "width": 4, "height": 1 },
+        { "position": [30, 5], "width": 4, "height": 1 },
+        { "position": [30, 10], "width": 4, "height": 1 },
+        { "position": [0, 21], "width": 4, "height": 1 },
+        { "position": [0, 26], "width": 4, "height": 1 },
+        { "position": [30, 21], "width": 4, "height": 1 },
+        { "position": [30, 26], "width": 4, "height": 1 },
+        { "position": [7, 3], "width": 20, "height": 1 },
+        { "position": [7, 8], "width": 20, "height": 1 },
+        { "position": [7, 18], "width": 20, "height": 1 },
+        { "position": [7, 23], "width": 20, "height": 1 },
+        { "position": [7, 28], "width": 20, "height": 1 },
+        { "position": [26, 4], "width": 5, "height": 1 },
+        { "position": [26, 9], "width": 5, "height": 1 },
+        { "position": [4, 1], "width": 4 },
+        { "position": [4, 6], "width": 4 },
+        { "position": [33, 11], "width": 1, "height": 4 },
+        { "position": [3, 11], "width": 1, "height": 4 },
+        { "position": [4, 24], "width": 4 },
+        { "position": [4, 29], "width": 4 },
+        { "position": [26, 19], "width": 5 },
+        { "position": [26, 25], "width": 5 },
+        { "position": [26, 29], "width": 5 },
+        { "position": [8, 17], "width": 1, "height": 1 }
+    ],
+    "triggers": [
+        ["mobius-toggle", 31, 11, 1.5, 1.5],
+        ["mobius-toggle", 9, 1, 1.5, 1.5],
+        ["mobius-toggle", 1, 6, 1.5, 1.5, true],
+        ["mobius-toggle", 10, 14, 1.5, 1.5, true]
+    ]
+}

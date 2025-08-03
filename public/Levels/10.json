@@ -2,6 +2,7 @@
     "width": 34,
     "height": 24,
     "mobius": false,
+    "nextLevel": 11,
     "goalType": "strangers-wing",
     "startPosition": [1.5, 1],
     "goalPosition": [2.5, 13.5],
